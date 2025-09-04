@@ -1,0 +1,25 @@
+"use client"
+
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+
+export default function Navbar() {
+  return (
+    <nav className="flex justify-between items-center px-10 py-4.25 shadow-md">
+      {/* Logo */}
+      <Link href="/" className="text-2xl font-bold">
+        Unified Health
+      </Link>
+
+      {/* Links */}
+      <div className="space-x-4">
+        <Link href="/doctor/login">
+          <Button variant="ghost">Patient Portal</Button>
+        </Link>
+        <Link href="/patient/login">
+          <Button variant="ghost">Doctor Portal</Button>
+        </Link>
+      </div>
+    </nav>
+  )
+}
