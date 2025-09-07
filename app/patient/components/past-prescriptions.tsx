@@ -80,7 +80,7 @@ export function PastPrescriptions({ patient }: PastPrescriptionsProps) {
   )
 
   const handleDownload = (prescriptionId: string) => {
-    console.log(`[v0] Downloading prescription ${prescriptionId}`)
+
     alert(`Downloading prescription ${prescriptionId}`)
   }
 

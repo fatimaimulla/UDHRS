@@ -153,7 +153,7 @@ export function VoiceInput({ onMedicinesGenerated, onNotesGenerated }: VoiceInpu
 
       recognition.onstart = () => {
         setError("")
-        console.log("[v0] Speech recognition started")
+        
       }
 
       recognition.onresult = (event: any) => {
@@ -174,18 +174,16 @@ export function VoiceInput({ onMedicinesGenerated, onNotesGenerated }: VoiceInpu
           setFinalTranscript((prev) => prev + finalTranscriptPart + " ")
         }
 
-        console.log("[v0] Interim transcript:", interimTranscript)
-        console.log("[v0] Final transcript part:", finalTranscriptPart)
+      
       }
 
       recognition.onerror = (event: any) => {
-        console.log("[v0] Speech recognition error:", event.error)
         setError(`Speech recognition error: ${event.error}`)
         setIsListening(false)
       }
 
       recognition.onend = () => {
-        console.log("[v0] Speech recognition ended")
+
         setIsListening(false)
         setTranscript("")
       }
@@ -214,7 +212,7 @@ export function VoiceInput({ onMedicinesGenerated, onNotesGenerated }: VoiceInpu
     try {
       recognitionRef.current.start()
     } catch (error) {
-      console.log("[v0] Error starting recognition:", error)
+
       setError("Failed to start speech recognition")
       setIsListening(false)
     }
@@ -245,7 +243,7 @@ export function VoiceInput({ onMedicinesGenerated, onNotesGenerated }: VoiceInpu
       setFinalTranscript("")
       setTranscript("")
     } catch (error) {
-      console.log("[v0] Error processing transcript:", error)
+
       setError("Failed to process voice input. Please try again.")
     } finally {
       setIsProcessing(false)

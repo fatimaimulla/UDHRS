@@ -49,7 +49,9 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
 
   const addMedicineRow = () => {
     const newId = (medicines.length + 1).toString()
+    
     setMedicines([...medicines, { id: newId, name: "", strength: "", frequency: "", days: 0 }])
+    
   }
 
   const removeMedicineRow = (id: string) => {
@@ -58,7 +60,9 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
     }
   }
 
-  const updateMedicine = (id: string, field: keyof Medicine, value: string | number) => {
+  const updateMedicine = (id: string, field: keyof Medicine, value: string | number) =>
+  {
+    
     setMedicines(medicines.map((med) => (med.id === id ? { ...med, [field]: value } : med)))
   }
 
@@ -73,7 +77,9 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
   };
 
 
-  const handleVoiceMedicines = (voiceMedicines: Medicine[]) => {
+  const handleVoiceMedicines = (voiceMedicines: Medicine[]) =>
+  {
+    console.log(voiceMedicines);
     setMedicines((prevMedicines) => {
       // Check if the current list only has one empty medicine
       const isOnlyEmpty =
@@ -92,6 +98,7 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
         ...med,
         id: `${Date.now()}-${Math.random()}`,
         frequency: frequencyMap[med.frequency] || med.frequency,
+        days: med.days && med.days > 0 ? med.days : 0,
       }));
 
       if (isOnlyEmpty) {

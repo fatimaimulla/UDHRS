@@ -48,13 +48,13 @@ export function ActivePrescriptions({ patient }: ActivePrescriptionsProps) {
   ]
 
   const handleDownload = (prescriptionId: string) => {
-    console.log(`[v0] Downloading prescription ${prescriptionId}`)
+
     // Mock download functionality
     alert(`Downloading prescription ${prescriptionId}`)
   }
 
   const handleView = (prescriptionId: string) => {
-    console.log(`[v0] Viewing prescription ${prescriptionId}`)
+
     // Mock view functionality
     alert(`Viewing detailed prescription ${prescriptionId}`)
   }
