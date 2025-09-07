@@ -21,78 +21,109 @@ interface VoiceInputProps {
 }
 
 // Simulate AI processing of voice transcript
-const processVoiceTranscript = async (transcript: string): Promise<{ medicines: Medicine[]; notes: string }> => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 2000))
+// const processVoiceTranscript = async (transcript: string): Promise<{ medicines: Medicine[]; notes: string }> => {
+//   // Simulate API delay
+//   await new Promise((resolve) => setTimeout(resolve, 2000))
 
-  // Mock AI processing - in real implementation, this would call your AI backend
-  const mockMedicines: Medicine[] = []
-  const lines = transcript.toLowerCase().split(/[.,;]/)
+//   // Mock AI processing - in real implementation, this would call your AI backend
+//   const mockMedicines: Medicine[] = []
+//   const lines = transcript.toLowerCase().split(/[.,;]/)
 
-  let medicineCounter = 1
+//   let medicineCounter = 1
 
-  for (const line of lines) {
-    if (line.includes("paracetamol") || line.includes("acetaminophen")) {
-      mockMedicines.push({
-        id: medicineCounter.toString(),
-        name: "Paracetamol",
-        strength: "500mg",
-        frequency: line.includes("twice") ? "BD" : line.includes("three times") ? "TDS" : "OD",
-        days: line.includes("week")
-          ? 7
-          : line.includes("days")
-            ? Number.parseInt(line.match(/(\d+)\s*days?/)?.[1] || "5")
-            : 5,
-      })
-      medicineCounter++
-    }
+//   for (const line of lines) {
+//     if (line.includes("paracetamol") || line.includes("acetaminophen")) {
+//       mockMedicines.push({
+//         id: medicineCounter.toString(),
+//         name: "Paracetamol",
+//         strength: "500mg",
+//         frequency: line.includes("twice") ? "BD" : line.includes("three times") ? "TDS" : "OD",
+//         days: line.includes("week")
+//           ? 7
+//           : line.includes("days")
+//             ? Number.parseInt(line.match(/(\d+)\s*days?/)?.[1] || "5")
+//             : 5,
+//       })
+//       medicineCounter++
+//     }
 
-    if (line.includes("ibuprofen")) {
-      mockMedicines.push({
-        id: medicineCounter.toString(),
-        name: "Ibuprofen",
-        strength: "400mg",
-        frequency: line.includes("twice") ? "BD" : line.includes("three times") ? "TDS" : "BD",
-        days: line.includes("week")
-          ? 7
-          : line.includes("days")
-            ? Number.parseInt(line.match(/(\d+)\s*days?/)?.[1] || "3")
-            : 3,
-      })
-      medicineCounter++
-    }
+//     if (line.includes("ibuprofen")) {
+//       mockMedicines.push({
+//         id: medicineCounter.toString(),
+//         name: "Ibuprofen",
+//         strength: "400mg",
+//         frequency: line.includes("twice") ? "BD" : line.includes("three times") ? "TDS" : "BD",
+//         days: line.includes("week")
+//           ? 7
+//           : line.includes("days")
+//             ? Number.parseInt(line.match(/(\d+)\s*days?/)?.[1] || "3")
+//             : 3,
+//       })
+//       medicineCounter++
+//     }
 
-    if (line.includes("amoxicillin") || line.includes("antibiotic")) {
-      mockMedicines.push({
-        id: medicineCounter.toString(),
-        name: "Amoxicillin",
-        strength: "250mg",
-        frequency: "TDS",
-        days: line.includes("week") ? 7 : 5,
-      })
-      medicineCounter++
-    }
+//     if (line.includes("amoxicillin") || line.includes("antibiotic")) {
+//       mockMedicines.push({
+//         id: medicineCounter.toString(),
+//         name: "Amoxicillin",
+//         strength: "250mg",
+//         frequency: "TDS",
+//         days: line.includes("week") ? 7 : 5,
+//       })
+//       medicineCounter++
+//     }
+//   }
+
+//   // If no medicines detected, create a sample one
+//   if (mockMedicines.length === 0) {
+//     mockMedicines.push({
+//       id: "1",
+//       name: "Paracetamol",
+//       strength: "500mg",
+//       frequency: "BD",
+//       days: 5,
+//     })
+//   }
+
+//   // Extract notes
+//   const notes =
+//     transcript.includes("note") || transcript.includes("instruction")
+//       ? "Take with food. Complete the full course as prescribed."
+//       : ""
+
+//   return { medicines: mockMedicines, notes }
+// }
+const processVoiceTranscript = async (
+  transcript: string
+): Promise<{ medicines: Medicine[]; notes: string }> => {
+  const res = await fetch("/api/parse-prescription", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ transcript }),
+  });
+
+  const result = await res.json();
+
+  if (result.error) {
+    throw new Error(result.error);
   }
 
-  // If no medicines detected, create a sample one
-  if (mockMedicines.length === 0) {
-    mockMedicines.push({
-      id: "1",
-      name: "Paracetamol",
-      strength: "500mg",
-      frequency: "BD",
-      days: 5,
-    })
-  }
+  const medicines = result.medicine.map((name: string, i: number) => ({
+    id: `${i}`,
+    name,
+    strength: result.medicineStrength[i] || "",
+    frequency: result.frequencyForDay[i] || "",
+    days: Number(result.forHowManyDays[i]) || 0,
+  }));
 
-  // Extract notes
-  const notes =
-    transcript.includes("note") || transcript.includes("instruction")
-      ? "Take with food. Complete the full course as prescribed."
-      : ""
+  return {
+    medicines,
+    notes: result.notes || "",
+  };
+};
 
-  return { medicines: mockMedicines, notes }
-}
 
 export function VoiceInput({ onMedicinesGenerated, onNotesGenerated }: VoiceInputProps) {
   const [isListening, setIsListening] = useState(false)

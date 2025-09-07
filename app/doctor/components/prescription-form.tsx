@@ -62,10 +62,53 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
     setMedicines(medicines.map((med) => (med.id === id ? { ...med, [field]: value } : med)))
   }
 
+  
+  const frequencyMap: { [key: string]: string } = {
+    OD: "OD",
+    BD: "BD",
+    TDS: "TDS",
+    "Morning Only": "Morning",
+    "Evening Only": "Evening",
+    "Morning & Evening": "Morning-Evening",
+  };
+
+
   const handleVoiceMedicines = (voiceMedicines: Medicine[]) => {
-    setMedicines(voiceMedicines)
-    setIsVoiceMode(false) // Switch back to manual mode to show populated form
-  }
+    setMedicines((prevMedicines) => {
+      // Check if the current list only has one empty medicine
+      const isOnlyEmpty =
+        prevMedicines.length === 1 && prevMedicines[0].name.trim() === "";
+
+      // Filter out duplicates based on name (case insensitive)
+      const existingNames = new Set(
+        prevMedicines.map((med) => med.name.trim().toLowerCase())
+      );
+
+      const newMedicines = voiceMedicines.filter(
+        (med) => !existingNames.has(med.name.trim().toLowerCase())
+      );
+
+      const updatedNewMedicines = newMedicines.map((med) => ({
+        ...med,
+        id: `${Date.now()}-${Math.random()}`,
+        frequency: frequencyMap[med.frequency] || med.frequency,
+      }));
+
+      if (isOnlyEmpty) {
+        // If only empty medicine exists, replace it
+        return updatedNewMedicines.length > 0
+          ? updatedNewMedicines
+          : prevMedicines;
+      }
+
+      // Otherwise append new medicines
+      return [...prevMedicines, ...updatedNewMedicines];
+    });
+
+    setIsVoiceMode(false);
+  };
+
+
 
   const handleVoiceNotes = (voiceNotes: string) => {
     setNotes(voiceNotes)
@@ -241,9 +284,12 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
         <CardContent>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <p className="font-semibold text-balance">{selectedPatient.name}</p>
+              <p className="font-semibold text-balance">
+                {selectedPatient.name}
+              </p>
               <p className="text-sm text-muted-foreground">
-                ID: {selectedPatient.id} • {selectedPatient.age} years • {selectedPatient.gender}
+                ID: {selectedPatient.id} • {selectedPatient.age} years •{" "}
+                {selectedPatient.gender}
               </p>
             </div>
             <Badge variant="secondary">Active</Badge>
@@ -277,7 +323,10 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
         </CardHeader>
         <CardContent className="space-y-6">
           {isVoiceMode ? (
-            <VoiceInput onMedicinesGenerated={handleVoiceMedicines} onNotesGenerated={handleVoiceNotes} />
+            <VoiceInput
+              onMedicinesGenerated={handleVoiceMedicines}
+              onNotesGenerated={handleVoiceNotes}
+            />
           ) : (
             <>
               {/* Medicine Rows */}
@@ -313,37 +362,56 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                       <div>
-                        <Label htmlFor={`medicine-name-${medicine.id}`}>Medicine Name</Label>
+                        <Label htmlFor={`medicine-name-${medicine.id}`}>
+                          Medicine Name
+                        </Label>
                         <Input
                           id={`medicine-name-${medicine.id}`}
                           placeholder="e.g., Paracetamol"
                           value={medicine.name}
-                          onChange={(e) => updateMedicine(medicine.id, "name", e.target.value)}
+                          onChange={(e) =>
+                            updateMedicine(medicine.id, "name", e.target.value)
+                          }
                         />
                       </div>
 
                       <div>
-                        <Label htmlFor={`medicine-strength-${medicine.id}`}>Strength</Label>
+                        <Label htmlFor={`medicine-strength-${medicine.id}`}>
+                          Strength
+                        </Label>
                         <Input
                           id={`medicine-strength-${medicine.id}`}
                           placeholder="e.g., 500mg"
                           value={medicine.strength}
-                          onChange={(e) => updateMedicine(medicine.id, "strength", e.target.value)}
+                          onChange={(e) =>
+                            updateMedicine(
+                              medicine.id,
+                              "strength",
+                              e.target.value
+                            )
+                          }
                         />
                       </div>
 
                       <div>
-                        <Label htmlFor={`medicine-frequency-${medicine.id}`}>Frequency</Label>
+                        <Label htmlFor={`medicine-frequency-${medicine.id}`}>
+                          Frequency
+                        </Label>
                         <Select
                           value={medicine.frequency}
-                          onValueChange={(value) => updateMedicine(medicine.id, "frequency", value)}
+                          onValueChange={(value) =>
+                            updateMedicine(medicine.id, "frequency", value)
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select frequency" />
                           </SelectTrigger>
                           <SelectContent>
                             {frequencyOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                              >
                                 {option.label}
                               </SelectItem>
                             ))}
@@ -352,14 +420,27 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
                       </div>
 
                       <div>
-                        <Label htmlFor={`medicine-days-${medicine.id}`}>Days</Label>
+                        <Label htmlFor={`medicine-days-${medicine.id}`}>
+                          Days
+                        </Label>
                         <Input
                           id={`medicine-days-${medicine.id}`}
                           type="number"
                           min="1"
                           placeholder="e.g., 7"
-                          value={medicine.days || ""}
-                          onChange={(e) => updateMedicine(medicine.id, "days", Number.parseInt(e.target.value) || 0)}
+                          value={
+                            medicine.days !== undefined &&
+                            medicine.days !== null
+                              ? medicine.days
+                              : ""
+                          }
+                          onChange={(e) =>
+                            updateMedicine(
+                              medicine.id,
+                              "days",
+                              Number.parseInt(e.target.value) || 0
+                            )
+                          }
                         />
                       </div>
                     </div>
@@ -383,7 +464,11 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
 
               {/* Action Buttons */}
               <div className="flex gap-4">
-                <Button onClick={handleReview} disabled={!isFormValid()} className="flex-1">
+                <Button
+                  onClick={handleReview}
+                  disabled={!isFormValid()}
+                  className="flex-1"
+                >
                   Review Prescription
                 </Button>
               </div>
@@ -392,5 +477,5 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
