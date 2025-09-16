@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { DashboardLayout } from "../components/dashboard-layout"
+import { DashboardLayout } from "../components/doctor-dashboard-layout"
 
 interface DoctorData {
   nmcId: string
