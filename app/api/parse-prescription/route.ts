@@ -24,9 +24,10 @@ export async function POST(req: Request) {
   "medicine": [],
   "medicineStrength": [],
   "frequencyForDay": [],
-  "forHowManyDays": []
+  "forHowManyDays": [],
+  "note": [],
 }
-Use these frequency terms where appropriate: "OD", "BD", "TDS", "Morning Only", "Evening Only", "Morning & Evening".`,
+Use these frequency terms where appropriate: "OD", "BD", "TDS", "Morning Only", "Evening Only", "Morning & Evening". If there is no note, keep "note" as a empty array.`,
             },
           ],
           temperature: 0,

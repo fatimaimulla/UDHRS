@@ -59,6 +59,7 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
       setMedicines(medicines.filter((med) => med.id !== id))
     }
   }
+  
 
   const updateMedicine = (id: string, field: keyof Medicine, value: string | number) =>
   {
@@ -351,7 +352,8 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
                   </Button>
                 </div>
 
-                {medicines.map((medicine, index) => (
+                  {medicines.map((medicine, index) => (
+                  
                   <Card key={medicine.id} className="p-4">
                     <div className="flex items-start justify-between mb-4">
                       <Badge variant="outline">Medicine {index + 1}</Badge>
@@ -435,6 +437,7 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
                           type="number"
                           min="1"
                           placeholder="e.g., 7"
+                          
                           value={
                             medicine.days !== undefined &&
                             medicine.days !== null
@@ -447,11 +450,14 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
                               "days",
                               Number.parseInt(e.target.value) || 0
                             )
+
                           }
                         />
                       </div>
                     </div>
+                   
                   </Card>
+                  
                 ))}
               </div>
 

@@ -104,8 +104,10 @@ const processVoiceTranscript = async (
     body: JSON.stringify({ transcript }),
   });
 
-  const result = await res.json();
+  console.log("API Response Status:", res);
 
+  const result = await res.json();
+console.log("Parsed Result:", result);
   if (result.error) {
     throw new Error(result.error);
   }
@@ -116,11 +118,12 @@ const processVoiceTranscript = async (
     strength: result.medicineStrength[i] || "",
     frequency: result.frequencyForDay[i] || "",
     days: Number(result.forHowManyDays[i]) || 0,
+    notes: result.note[i] || "",
   }));
 
   return {
     medicines,
-    notes: result.notes || "",
+    notes: result.note[0] || "",
   };
 };
 
