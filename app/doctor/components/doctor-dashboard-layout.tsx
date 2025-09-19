@@ -20,15 +20,30 @@ import { PatientSearch } from "./patient-search";
 import { PrescriptionForm } from "./prescription-form";
 import { PatientHistory } from "./patient-history";
 
-interface DoctorData {
-  nmcId: string;
-  name: string;
-  specialization: string;
-  hospital: string;
+interface Doctor {
+  _id: string
+  nmcId: string
+  fullName: string
+  specialty: string
+  organization: string
+  contact: {
+    email: string
+    phone: string
+    address: {
+      line1: string
+      city: string
+      state: string
+      postalCode: string
+      country: string
+    }
+  }
+  createdAt: string
+  updatedAt: string
+  __v: number
 }
 
 interface DashboardLayoutProps {
-  doctorData: DoctorData;
+  doctorData: Doctor;
 }
 
 const DashboardLayout = ({ doctorData }: DashboardLayoutProps) => {
@@ -106,10 +121,10 @@ const DashboardLayout = ({ doctorData }: DashboardLayoutProps) => {
           <div className="hidden lg:flex items-center space-x-4">
             <div className="text-right">
               <p className="text-sm font-medium text-foreground">
-                {doctorData.name}
+                {doctorData.fullName}
               </p>
               <p className="text-xs text-muted-foreground">
-                {doctorData.specialization}
+                {doctorData.specialty}
               </p>
             </div>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
@@ -124,10 +139,10 @@ const DashboardLayout = ({ doctorData }: DashboardLayoutProps) => {
             <div className="p-4 space-y-4">
               <div className="text-center pb-4 border-b">
                 <p className="text-sm font-medium text-foreground">
-                  {doctorData.name}
+                  {doctorData.fullName}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {doctorData.specialization}
+                  {doctorData.specialty}
                 </p>
               </div>
               <nav className="space-y-2">
@@ -223,7 +238,7 @@ const DashboardLayout = ({ doctorData }: DashboardLayoutProps) => {
             <div className="space-y-6">
               <div>
                 <h1 className="text-2xl lg:text-3xl font-bold text-foreground text-balance">
-                  Welcome back, {doctorData.name}
+                  Welcome back, {doctorData.fullName}
                 </h1>
                 <p className="text-muted-foreground">
                   Here's your dashboard overview

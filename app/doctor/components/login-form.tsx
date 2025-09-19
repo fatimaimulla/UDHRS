@@ -21,9 +21,17 @@ export function LoginForm() {
     setIsLoading(true)
 
     try {
-      const message = await login(nmcId, "doctor");
+      const res = await login(nmcId, "doctor");
      
-
+      if (!res.success)
+    {
+      console.log(res.status)
+      throw new Error("Invalid NMC ID" );
+    }
+    else
+    {
+      router.push("/doctor/check-email")
+   }
       
     } catch (err) {
       

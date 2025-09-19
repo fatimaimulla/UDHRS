@@ -51,7 +51,9 @@ export default function PatientDashboard() {
     console.log("🔎 savedToken:", savedToken)
 
     // CASE 1: Token comes from MagicLink in URL
-    if (tokenFromUrl) {
+    if (tokenFromUrl)
+    {
+        
       fetch(`${API_BASE}/auth/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
