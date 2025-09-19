@@ -7,16 +7,21 @@ import {
   User,
   FileText,
   History,
-  Calendar,
   LogOut,
   Menu,
   X,
-  Shield
+  Shield,
+  Folder,
+  BarChart3, 
+  Users 
 } from "lucide-react"
 import { PatientProfile } from "./patient-profile"
 import { ActivePrescriptions } from "./active-prescriptions"
 import { PastPrescriptions } from "./past-prescriptions"
 import { ConsentDashboard } from "./consent-dashboard"
+import { UploadDocuments } from "./UploadDocuments"
+import { ReportSummarization } from "./ReportSummarization"
+import { GroupsSection } from "./groups-section"
 
 export interface Patient {
   _id: string
@@ -158,6 +163,27 @@ const PatientDashboardLayout = ({ patient }: PatientDashboardLayoutProps) => {
                 >
                   <Shield className="mr-2 h-4 w-4" /> Consent Manager
                 </Button>
+                <Button
+                  variant={activeTab === "documents" ? "default" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveTab("documents")}
+                >
+                  <Folder className="mr-2 h-4 w-4" /> My Documents
+                </Button>
+                <Button
+                  variant={activeTab === "summarization" ? "default" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveTab("summarization")}
+                >
+                  <BarChart3 className="mr-2 h-4 w-4" /> Report Summarization
+                </Button>
+                <Button
+                  variant={activeTab === "groups" ? "default" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => setActiveTab("groups")}
+                >
+                  <Users className="mr-2 h-4 w-4" /> Groups
+                </Button>
               </nav>
               <Button
                 variant="outline"
@@ -204,6 +230,20 @@ const PatientDashboardLayout = ({ patient }: PatientDashboardLayoutProps) => {
             >
               <Shield className="mr-2 h-4 w-4" /> Consent Manager
             </Button>
+            <Button
+              variant={activeTab === "documents" ? "default" : "ghost"}
+              className="w-full justify-start"
+              onClick={() => setActiveTab("documents")}
+            >
+              <Folder className="mr-2 h-4 w-4" /> My Documents
+            </Button>
+            <Button
+                variant={activeTab === "groups" ? "default" : "ghost"}
+                className="w-full justify-start"
+                onClick={() => setActiveTab("groups")}
+              >
+              <Users className="mr-2 h-4 w-4" /> Groups
+            </Button>
           </nav>
         </aside>
 
@@ -213,6 +253,9 @@ const PatientDashboardLayout = ({ patient }: PatientDashboardLayoutProps) => {
           {activeTab === "active" && <ActivePrescriptions patient={patient} />}
           {activeTab === "history" && <PastPrescriptions patient={patient} />}
           {activeTab === "consent" && <ConsentDashboard />}
+          {activeTab === "documents" && <UploadDocuments />}
+          {activeTab === "summarization" && <ReportSummarization />}
+          {activeTab === "groups" && <GroupsSection />}
         </main>
       </div>
     </div>
