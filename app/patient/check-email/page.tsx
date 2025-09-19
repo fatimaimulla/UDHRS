@@ -10,7 +10,7 @@ export default function PatientCheckEmailPage() {
         <Card className="w-full">
           <CardHeader className="text-center space-y-4">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent/10">
-              <Mail className="h-8 w-8 text-accent" />
+              <Mail className="h-8 w-8 text-black" />
             </div>
             <CardTitle className="text-2xl flex items-center justify-center gap-2">
               <User className="h-6 w-6 text-accent" />
