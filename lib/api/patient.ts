@@ -12,3 +12,4 @@ export async function getPrescriptions(token: string) {
 
   return res.json();
 }
+
