@@ -58,7 +58,9 @@ const handleSubmit = async (e: React.FormEvent) => {
           <User className="h-6 w-6 text-primary" />
           Patient Login
         </CardTitle>
-        <CardDescription className="text-center">Enter your ABHA ID to access your health records</CardDescription>
+        <CardDescription className="text-center">
+          Enter your ABHA ID to access your health records
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -75,7 +77,9 @@ const handleSubmit = async (e: React.FormEvent) => {
             />
           </div>
 
-          {error && <div className="text-destructive text-sm text-center">{error}</div>}
+          {error && (
+            <div className="text-destructive text-sm text-center">{error}</div>
+          )}
 
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Signing In..." : "Sign In"}
@@ -89,12 +93,12 @@ const handleSubmit = async (e: React.FormEvent) => {
           </div>
           <div className="text-xs text-muted-foreground space-y-1">
             <div>12-3456-7890-0001 (Mithrajeeth Yadavar)</div>
-            <div>98-7654-3210-9876 (Priya Sharma)</div>
-            <div>11-2233-4455-6677 (Amit Patel)</div>
-            <div>55-6677-8899-0011 (Sunita Singh)</div>
+            <div>12-3456-7890-0002 (Tufail Ahmed Khan)</div>
+            <div>12-3456-7890-0003 (Fatima Mulla)</div>
+            <div>12-1234-1234-1234 (Araya Bhagat)</div>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
