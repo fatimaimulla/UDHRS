@@ -1,0 +1,1582 @@
+JavaScript files in ./app/patient:
+
+check-email/page.tsx
+// Content of check-email/page.tsx:
+import Link from "next/link"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Mail, User, ArrowLeft, Clock, Shield } from "lucide-react"
+
+export default function PatientCheckEmailPage() {
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <Card className="w-full">
+          <CardHeader className="text-center space-y-4">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent/10">
+              <Mail className="h-8 w-8 text-accent" />
+            </div>
+            <CardTitle className="text-2xl flex items-center justify-center gap-2">
+              <User className="h-6 w-6 text-accent" />
+              Check Your Email
+            </CardTitle>
+            <CardDescription className="text-base">
+              We've sent a secure magic link to your registered email address
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            <div className="text-center space-y-4">
+              <div className="p-4 bg-muted rounded-lg">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Shield className="h-4 w-4 text-accent" />
+                  <span className="text-sm font-medium">Secure ABHA ID Authentication</span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  The magic link is associated with your verified ABHA ID and will provide secure access to your health
+                  records.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Click the link in your email to complete sign-in. The link will expire in 15 minutes for security.
+                </p>
+
+                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  <span>Magic link expires in 15 minutes</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground mb-3">
+                  Didn't receive the email? Check your spam folder or
+                </p>
+                <Button variant="outline" className="w-full bg-transparent">
+                  Resend Magic Link
+                </Button>
+              </div>
+
+              <div className="text-center">
+                <Link href="/patient/login">
+                  <Button variant="ghost" className="w-full">
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Back to Login
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="mt-6 text-center">
+          <p className="text-xs text-muted-foreground">
+            Having trouble? Contact support for assistance with ABHA ID verification.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+
+components/ContactCard.tsx
+// Content of components/ContactCard.tsx:
+"use client"
+
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Mail, Phone, MapPin } from "lucide-react"
+
+interface Address {
+  line1: string
+  city: string
+  state: string
+  postalCode: string
+  country: string
+}
+
+interface Contact {
+  phone: string
+  email: string
+  address: Address
+}
+
+interface ContactCardProps {
+  contact: Contact
+}
+
+export function ContactCard({ contact }: ContactCardProps) {
+  return (
+    <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Phone className="h-5 w-5 text-primary" />
+            Contact Details
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Phone className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Phone</p>
+                <p className="text-base text-foreground">{contact.phone}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Email</p>
+                <p className="text-base text-foreground">{contact.email}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <MapPin className="h-4 w-4 text-muted-foreground mt-1" />
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Address</p>
+                {/* <p className="text-base text-foreground">{profileData.address}</p> */}
+                <div>
+                    <p>{contact.address.line1}</p>
+                    <p>
+                    {contact.address.city}, {contact.address.state}{" "}
+                    {contact.address.postalCode}
+                    </p>
+                    <p>{contact.address.country}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+    </Card>
+  )
+}
+
+components/EmergencyDetailsCard.tsx
+// Content of components/EmergencyDetailsCard.tsx:
+"use client"
+
+import { useState } from "react"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { AlertCircle } from "lucide-react"
+
+interface EmergencyContact {
+  name: string
+  relation: string
+  phone: string
+}
+
+interface MedicalInfo {
+  allergies: string[]
+  chronicConditions: string[]
+}
+
+interface EmergencyDetailsCardProps {
+  fullName: string
+  age: number
+  gender: string
+  bloodGroup: string
+  emergencyContact: EmergencyContact
+  medical: MedicalInfo
+}
+
+export function EmergencyDetailsCard({
+  fullName,
+  age,
+  gender,
+  bloodGroup,
+  emergencyContact,
+  medical,
+}: EmergencyDetailsCardProps) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [contact, setContact] = useState(emergencyContact)
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setContact({ ...contact, [e.target.name]: e.target.value })
+  }
+
+  const handleSave = () => {
+    // 🔥 Later: Call backend API to update contact info
+    console.log("Updated Emergency Contact:", contact)
+    setIsEditing(false)
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <AlertCircle className="h-5 w-5 text-primary" />
+          <CardTitle>Emergency Contact</CardTitle>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Basic Info */}
+        <div className="flex flex-wrap gap-6">
+          <p><span className="font-medium">Name:</span> {fullName}</p>
+          <p><span className="font-medium">Age:</span> {age}</p>
+          <p><span className="font-medium">Gender:</span> {gender}</p>
+          <p><span className="font-medium">Blood Group:</span> {bloodGroup}</p>
+        </div>
+
+        {/* Medical Info */}
+        <div>
+          <p className="font-medium">Allergies:</p>
+          <ul className="list-disc ml-5 text-sm">
+            {medical.allergies.length > 0 ? (
+              medical.allergies.map((a, i) => <li key={i}>{a}</li>)
+            ) : (
+              <li>None</li>
+            )}
+          </ul>
+        </div>
+        <div>
+          <p className="font-medium">Chronic Conditions:</p>
+          <ul className="list-disc ml-5 text-sm">
+            {medical.chronicConditions.length > 0 ? (
+              medical.chronicConditions.map((c, i) => <li key={i}>{c}</li>)
+            ) : (
+              <li>None</li>
+            )}
+          </ul>
+        </div>
+
+        {/* Emergency Contact */}
+        <div>
+          <p className="font-medium mb-2">Emergency Contact:</p>
+          {isEditing ? (
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="name">Name</Label>
+                <Input id="name" name="name" value={contact.name} onChange={handleChange} />
+              </div>
+              <div>
+                <Label htmlFor="relation">Relation</Label>
+                <Input id="relation" name="relation" value={contact.relation} onChange={handleChange} />
+              </div>
+              <div>
+                <Label htmlFor="phone">Phone</Label>
+                <Input id="phone" name="phone" value={contact.phone} onChange={handleChange} />
+              </div>
+
+              <div className="flex gap-2">
+                <Button size="sm" onClick={handleSave}>Save</Button>
+                <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>Cancel</Button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p>{contact.name} ({contact.relation})</p>
+              <p className="text-sm text-muted-foreground">{contact.phone}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={() => setIsEditing(true)}
+              >
+                Edit Contact
+              </Button>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+
+components/MedicalInfoCard.tsx
+// Content of components/MedicalInfoCard.tsx:
+"use client"
+
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge";
+import {  Heart } from "lucide-react"
+
+interface MedicalInfo {
+  allergies: string[]
+  chronicConditions: string[]
+}
+
+interface MedicalInfoCardProps {
+  medical: MedicalInfo
+}
+
+export function MedicalInfoCard({ medical }: MedicalInfoCardProps) {
+  return (
+    <Card>
+        <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+            <Heart className="h-5 w-5 text-primary" />
+            Medical Information
+            </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4 text-sm">
+            {/* Allergies */}
+            <div>
+            <p className="font-medium mb-2">Allergies</p>
+            {medical.allergies && medical.allergies.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                {medical.allergies.map((allergy, index) => (
+                    <Badge key={index} variant="destructive" className="px-3 py-1.5">
+                    {allergy}
+                    </Badge>
+                ))}
+                </div>
+            ) : (
+                <p className="text-muted-foreground">No known allergies</p>
+            )}
+            </div>
+
+            {/* Chronic Conditions */}
+            <div>
+            <p className="font-medium mb-2">Chronic Conditions</p>
+            {medical.chronicConditions && medical.chronicConditions.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                {medical.chronicConditions.map((condition, index) => (
+                    <Badge key={index} variant="secondary" className="px-3 py-1.5">
+                    {condition}
+                    </Badge>
+                ))}
+                </div>
+            ) : (
+                <p className="text-muted-foreground">No chronic conditions</p>
+            )}
+            </div>
+        </CardContent>
+    </Card>
+  )
+}
+
+components/ProfileCard.tsx
+// Content of components/ProfileCard.tsx:
+"use client"
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { User } from "lucide-react"
+
+interface ProfileCardProps {
+  fullName: string
+  abhaId: string
+  age: number
+  gender: string
+  bloodGroup: string
+}
+
+export function ProfileCard({
+  fullName,
+  abhaId,
+  age,
+  gender,
+  bloodGroup,
+}: ProfileCardProps) {
+  return (
+    <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5 text-primary" />
+            Personal Information
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Full Name</p>
+              <p className="text-base font-semibold text-foreground">{fullName}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">ABHA ID</p>
+              <p className="text-base font-mono text-foreground">{abhaId}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Age</p>
+              <p className="text-base text-foreground">{age} years</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Gender</p>
+              <p className="text-base text-foreground">{gender}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Blood Group</p>
+              <Badge variant="outline" className="text-base font-semibold">
+                {bloodGroup}
+              </Badge>
+            </div>
+          </div>
+        </CardContent>
+    </Card>
+  )
+}
+
+
+components/active-prescriptions.tsx
+// Content of components/active-prescriptions.tsx:
+"use client"
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Pill, Clock, Calendar, Download, Eye } from "lucide-react"
+
+interface Patient {
+  abhaId: string
+  name: string
+  age: number
+  gender: string
+}
+
+interface ActivePrescriptionsProps {
+  patient: Patient
+}
+
+export function ActivePrescriptions({ patient }: ActivePrescriptionsProps) {
+  // Mock active prescriptions data
+  const activePrescriptions = [
+    {
+      id: "RX-2024-001",
+      doctorName: "Dr. Rajesh Gupta",
+      specialization: "Cardiologist",
+      date: "2024-01-15",
+      condition: "Hypertension",
+      medicines: [
+        { name: "Amlodipine", strength: "5mg", frequency: "OD", duration: "30 days", remaining: 15 },
+        { name: "Metoprolol", strength: "25mg", frequency: "BD", duration: "30 days", remaining: 15 },
+      ],
+      status: "Active",
+      nextReview: "2024-02-15",
+    },
+    {
+      id: "RX-2024-002",
+      doctorName: "Dr. Priya Sharma",
+      specialization: "Endocrinologist",
+      date: "2024-01-20",
+      condition: "Diabetes Type 2",
+      medicines: [
+        { name: "Metformin", strength: "500mg", frequency: "BD", duration: "90 days", remaining: 75 },
+        { name: "Glimepiride", strength: "2mg", frequency: "OD", duration: "90 days", remaining: 75 },
+      ],
+      status: "Active",
+      nextReview: "2024-04-20",
+    },
+  ]
+
+  const handleDownload = (prescriptionId: string) => {
+
+    // Mock download functionality
+    alert(`Downloading prescription ${prescriptionId}`)
+  }
+
+  const handleView = (prescriptionId: string) => {
+
+    // Mock view functionality
+    alert(`Viewing detailed prescription ${prescriptionId}`)
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-foreground">Active Prescriptions</h3>
+          <p className="text-sm text-muted-foreground">Current medications and treatments</p>
+        </div>
+        <Badge variant="secondary" className="text-sm">
+          {activePrescriptions.length} Active
+        </Badge>
+      </div>
+
+      {activePrescriptions.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Pill className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">No Active Prescriptions</h3>
+            <p className="text-muted-foreground text-center">You don't have any active prescriptions at the moment.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-6">
+          {activePrescriptions.map((prescription) => (
+            <Card key={prescription.id} className="border-l-4 border-l-accent">
+              <CardHeader>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Pill className="h-5 w-5 text-primary" />
+                      {prescription.condition}
+                    </CardTitle>
+                    <CardDescription className="mt-1">
+                      Prescribed by {prescription.doctorName} ({prescription.specialization})
+                    </CardDescription>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="default" className="bg-accent text-accent-foreground">
+                      {prescription.status}
+                    </Badge>
+                    <span className="text-sm text-muted-foreground">ID: {prescription.id}</span>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Prescription Details */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Prescribed</p>
+                      <p className="text-sm font-medium">{new Date(prescription.date).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Next Review</p>
+                      <p className="text-sm font-medium">{new Date(prescription.nextReview).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Pill className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Medicines</p>
+                      <p className="text-sm font-medium">{prescription.medicines.length} items</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Medicines List */}
+                <div className="space-y-3">
+                  <h4 className="text-sm font-semibold text-foreground">Medications</h4>
+                  {prescription.medicines.map((medicine, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border border-border rounded-lg">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h5 className="font-medium text-foreground">{medicine.name}</h5>
+                          <Badge variant="outline" className="text-xs">
+                            {medicine.strength}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span>{medicine.frequency}</span>
+                          <span>•</span>
+                          <span>{medicine.duration}</span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-foreground">{medicine.remaining} days left</p>
+                        <div className="w-20 bg-muted rounded-full h-2 mt-1">
+                          <div
+                            className="bg-accent h-2 rounded-full transition-all"
+                            style={{ width: `${(medicine.remaining / Number.parseInt(medicine.duration)) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t border-border">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleView(prescription.id)}
+                    className="flex items-center gap-2"
+                  >
+                    <Eye className="h-4 w-4" />
+                    View Details
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDownload(prescription.id)}
+                    className="flex items-center gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+
+components/past-prescriptions.tsx
+// Content of components/past-prescriptions.tsx:
+"use client"
+
+import { useState } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { History, Search, Eye, Download, Calendar, User } from "lucide-react"
+
+interface Patient {
+  abhaId: string
+  name: string
+  age: number
+  gender: string
+}
+
+interface PastPrescriptionsProps {
+  patient: Patient
+}
+
+export function PastPrescriptions({ patient }: PastPrescriptionsProps) {
+  const [searchTerm, setSearchTerm] = useState("")
+
+  // Mock past prescriptions data
+  const pastPrescriptions = [
+    {
+      id: "RX-2023-045",
+      doctorName: "Dr. Amit Kumar",
+      specialization: "General Physician",
+      date: "2023-12-10",
+      condition: "Common Cold",
+      medicines: [
+        { name: "Paracetamol", strength: "500mg", frequency: "TDS", duration: "5 days" },
+        { name: "Cetirizine", strength: "10mg", frequency: "OD", duration: "7 days" },
+      ],
+      status: "Completed",
+      notes: "Patient recovered well. No complications.",
+    },
+    {
+      id: "RX-2023-032",
+      doctorName: "Dr. Sunita Patel",
+      specialization: "Dermatologist",
+      date: "2023-11-15",
+      condition: "Eczema",
+      medicines: [
+        { name: "Hydrocortisone Cream", strength: "1%", frequency: "BD", duration: "14 days" },
+        { name: "Moisturizer", strength: "N/A", frequency: "TDS", duration: "30 days" },
+      ],
+      status: "Completed",
+      notes: "Skin condition improved significantly.",
+    },
+    {
+      id: "RX-2023-018",
+      doctorName: "Dr. Rajesh Gupta",
+      specialization: "Cardiologist",
+      date: "2023-10-20",
+      condition: "Hypertension Follow-up",
+      medicines: [
+        { name: "Amlodipine", strength: "5mg", frequency: "OD", duration: "30 days" },
+        { name: "Aspirin", strength: "75mg", frequency: "OD", duration: "30 days" },
+      ],
+      status: "Completed",
+      notes: "Blood pressure well controlled. Continue current medication.",
+    },
+  ]
+
+  const filteredPrescriptions = pastPrescriptions.filter(
+    (prescription) =>
+      prescription.condition.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prescription.doctorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prescription.id.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
+
+  const handleDownload = (prescriptionId: string) => {
+
+    alert(`Downloading prescription ${prescriptionId}`)
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h3 className="text-lg font-semibold text-foreground">Past Prescriptions</h3>
+          <p className="text-sm text-muted-foreground">Your medical history and completed treatments</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search prescriptions..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 w-full sm:w-64"
+            />
+          </div>
+          <Badge variant="secondary" className="text-sm">
+            {filteredPrescriptions.length} Records
+          </Badge>
+        </div>
+      </div>
+
+      {filteredPrescriptions.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <History className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              {searchTerm ? "No matching prescriptions" : "No past prescriptions"}
+            </h3>
+            <p className="text-muted-foreground text-center">
+              {searchTerm
+                ? "Try adjusting your search terms to find what you're looking for."
+                : "Your prescription history will appear here once you have completed treatments."}
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4">
+          {filteredPrescriptions.map((prescription) => (
+            <Card key={prescription.id} className="border-l-4 border-l-muted-foreground">
+              <CardHeader>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <CardTitle className="text-base">{prescription.condition}</CardTitle>
+                    <CardDescription className="flex items-center gap-2 mt-1">
+                      <User className="h-3 w-3" />
+                      {prescription.doctorName} ({prescription.specialization})
+                    </CardDescription>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary">{prescription.status}</Badge>
+                    <span className="text-xs text-muted-foreground">ID: {prescription.id}</span>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      {new Date(prescription.date).toLocaleDateString()}
+                    </div>
+                    <span>•</span>
+                    <span>{prescription.medicines.length} medicines</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="flex items-center gap-2 bg-transparent">
+                          <Eye className="h-3 w-3" />
+                          View
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle className="flex items-center gap-2">
+                            <History className="h-5 w-5 text-primary" />
+                            Prescription Details - {prescription.id}
+                          </DialogTitle>
+                          <DialogDescription>
+                            Prescribed by {prescription.doctorName} on{" "}
+                            {new Date(prescription.date).toLocaleDateString()}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-6">
+                          {/* Prescription Info */}
+                          <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground">Condition</p>
+                              <p className="text-base font-semibold">{prescription.condition}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground">Status</p>
+                              <Badge variant="secondary">{prescription.status}</Badge>
+                            </div>
+                          </div>
+
+                          {/* Medicines */}
+                          <div>
+                            <h4 className="text-sm font-semibold text-foreground mb-3">Prescribed Medications</h4>
+                            <div className="space-y-3">
+                              {prescription.medicines.map((medicine, index) => (
+                                <div key={index} className="p-3 border border-border rounded-lg">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <h5 className="font-medium text-foreground">{medicine.name}</h5>
+                                    <Badge variant="outline" className="text-xs">
+                                      {medicine.strength}
+                                    </Badge>
+                                  </div>
+                                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                    <span>Frequency: {medicine.frequency}</span>
+                                    <span>•</span>
+                                    <span>Duration: {medicine.duration}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Notes */}
+                          {prescription.notes && (
+                            <div>
+                              <h4 className="text-sm font-semibold text-foreground mb-2">Doctor's Notes</h4>
+                              <p className="text-sm text-muted-foreground p-3 bg-muted rounded-lg">
+                                {prescription.notes}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDownload(prescription.id)}
+                      className="flex items-center gap-2"
+                    >
+                      <Download className="h-3 w-3" />
+                      Download
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+
+components/patient-appointments.tsx
+// Content of components/patient-appointments.tsx:
+"use client"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Calendar, Clock, User, MapPin, Phone, Video, Plus } from "lucide-react"
+
+interface Patient {
+  abhaId: string
+  name: string
+  age: number
+  gender: string
+}
+
+interface PatientAppointmentsProps {
+  patient: Patient
+}
+
+export function PatientAppointments({ patient }: PatientAppointmentsProps) {
+  // Mock appointments data
+  const upcomingAppointments = [
+    {
+      id: "APT-2024-001",
+      doctorName: "Dr. Rajesh Gupta",
+      specialization: "Cardiologist",
+      date: "2024-02-15",
+      time: "10:30 AM",
+      type: "Follow-up",
+      mode: "In-person",
+      location: "City Hospital, Room 205",
+      status: "Confirmed",
+      notes: "Bring previous test reports",
+    },
+    {
+      id: "APT-2024-002",
+      doctorName: "Dr. Priya Sharma",
+      specialization: "Endocrinologist",
+      date: "2024-02-20",
+      time: "2:00 PM",
+      type: "Consultation",
+      mode: "Video Call",
+      location: "Online",
+      status: "Confirmed",
+      notes: "Diabetes management review",
+    },
+    {
+      id: "APT-2024-003",
+      doctorName: "Dr. Amit Kumar",
+      specialization: "General Physician",
+      date: "2024-02-25",
+      time: "11:15 AM",
+      type: "Check-up",
+      mode: "In-person",
+      location: "Health Center, Ground Floor",
+      status: "Pending",
+      notes: "Annual health screening",
+    },
+  ]
+
+  const pastAppointments = [
+    {
+      id: "APT-2024-000",
+      doctorName: "Dr. Sunita Patel",
+      specialization: "Dermatologist",
+      date: "2024-01-10",
+      time: "3:30 PM",
+      type: "Treatment",
+      mode: "In-person",
+      status: "Completed",
+    },
+  ]
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Confirmed":
+        return "default"
+      case "Pending":
+        return "secondary"
+      case "Completed":
+        return "outline"
+      default:
+        return "secondary"
+    }
+  }
+
+  const getModeIcon = (mode: string) => {
+    return mode === "Video Call" ? Video : MapPin
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Upcoming Appointments */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-semibold text-foreground">Upcoming Appointments</h3>
+            <p className="text-sm text-muted-foreground">Your scheduled medical appointments</p>
+          </div>
+          <Button className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Book Appointment
+          </Button>
+        </div>
+
+        {upcomingAppointments.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <Calendar className="h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">No Upcoming Appointments</h3>
+              <p className="text-muted-foreground text-center mb-4">You don't have any scheduled appointments.</p>
+              <Button className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Book Your First Appointment
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-4">
+            {upcomingAppointments.map((appointment) => {
+              const ModeIcon = getModeIcon(appointment.mode)
+              return (
+                <Card key={appointment.id} className="border-l-4 border-l-primary">
+                  <CardHeader>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      <div>
+                        <CardTitle className="flex items-center gap-2 text-lg">
+                          <User className="h-5 w-5 text-primary" />
+                          {appointment.doctorName}
+                        </CardTitle>
+                        <CardDescription className="mt-1">
+                          {appointment.specialization} • {appointment.type}
+                        </CardDescription>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={getStatusColor(appointment.status)}>{appointment.status}</Badge>
+                        <span className="text-sm text-muted-foreground">ID: {appointment.id}</span>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Appointment Details */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-muted rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Date</p>
+                          <p className="text-sm font-medium">{new Date(appointment.date).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Time</p>
+                          <p className="text-sm font-medium">{appointment.time}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <ModeIcon className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Mode</p>
+                          <p className="text-sm font-medium">{appointment.mode}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Location</p>
+                          <p className="text-sm font-medium">{appointment.location}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Notes */}
+                    {appointment.notes && (
+                      <div className="p-3 bg-accent/10 border border-accent/20 rounded-lg">
+                        <p className="text-sm font-medium text-foreground mb-1">Important Notes:</p>
+                        <p className="text-sm text-muted-foreground">{appointment.notes}</p>
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t border-border">
+                      {appointment.mode === "Video Call" && (
+                        <Button variant="default" size="sm" className="flex items-center gap-2">
+                          <Video className="h-4 w-4" />
+                          Join Video Call
+                        </Button>
+                      )}
+                      <Button variant="outline" size="sm" className="flex items-center gap-2 bg-transparent">
+                        <Phone className="h-4 w-4" />
+                        Contact Doctor
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        Reschedule
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive hover:text-destructive bg-transparent"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Past Appointments */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-semibold text-foreground">Past Appointments</h3>
+            <p className="text-sm text-muted-foreground">Your appointment history</p>
+          </div>
+          <Badge variant="secondary" className="text-sm">
+            {pastAppointments.length} Completed
+          </Badge>
+        </div>
+
+        {pastAppointments.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-8">
+              <Calendar className="h-8 w-8 text-muted-foreground mb-2" />
+              <p className="text-muted-foreground text-center">No past appointments to display.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-3">
+            {pastAppointments.map((appointment) => (
+              <Card key={appointment.id} className="border-l-4 border-l-muted-foreground">
+                <CardContent className="py-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div>
+                      <h4 className="font-medium text-foreground">{appointment.doctorName}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {appointment.specialization} • {new Date(appointment.date).toLocaleDateString()} at{" "}
+                        {appointment.time}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline">{appointment.status}</Badge>
+                      <Button variant="ghost" size="sm">
+                        View Details
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+
+components/patient-dashboard-layout.tsx
+// Content of components/patient-dashboard-layout.tsx:
+"use client"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { PatientProfile } from "./patient-profile"
+import { ActivePrescriptions } from "./active-prescriptions"
+import { PastPrescriptions } from "./past-prescriptions"
+import { PatientAppointments } from "./patient-appointments"
+import { User, FileText, History, Calendar, LogOut, Menu, X } from "lucide-react"
+
+interface Patient {
+  abhaId: string
+  name: string
+  age: number
+  gender: string
+}
+
+interface PatientDashboardLayoutProps {
+  patient: Patient
+}
+
+const PatientDashboardLayout = ({ patient }: PatientDashboardLayoutProps) => {
+  const [activeTab, setActiveTab] = useState("profile")
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const router = useRouter()
+
+  const handleLogout = () => {
+    localStorage.removeItem("currentPatient")
+    router.push("/")
+  }
+
+  const tabs = [
+    { id: "profile", label: "Profile", icon: User },
+    { id: "active", label: "Active Prescriptions", icon: FileText },
+    { id: "history", label: "Past Prescriptions", icon: History },
+    { id: "appointments", label: "Appointments", icon: Calendar },
+  ]
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="bg-card border-b border-border sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                  <User className="h-4 w-4 text-primary-foreground" />
+                </div>
+                <div>
+                  <h1 className="text-lg font-semibold text-foreground">Patient Portal</h1>
+                  <p className="text-xs text-muted-foreground hidden sm:block">Digital Health Records</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="hidden sm:block text-right">
+                <p className="text-sm font-medium text-foreground">{patient.name}</p>
+                <p className="text-xs text-muted-foreground">ABHA: {patient.abhaId}</p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                className="hidden sm:flex items-center gap-2 bg-transparent"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="sm:hidden"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="sm:hidden border-t border-border bg-card">
+            <div className="px-4 py-3 space-y-2">
+              <div className="text-center pb-2 border-b border-border">
+                <p className="text-sm font-medium text-foreground">{patient.name}</p>
+                <p className="text-xs text-muted-foreground">ABHA: {patient.abhaId}</p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2 bg-transparent"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-foreground mb-2">Welcome back, {patient.name.split(" ")[0]}!</h2>
+          <p className="text-muted-foreground">Access and manage your health records</p>
+        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 h-auto p-1">
+            {tabs.map((tab) => {
+              const Icon = tab.icon
+              return (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab.id}
+                  className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm"
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{tab.label.split(" ")[0]}</span>
+                </TabsTrigger>
+              )
+            })}
+          </TabsList>
+
+          <TabsContent value="profile" className="space-y-6">
+            <PatientProfile patient={patient} />
+          </TabsContent>
+
+          <TabsContent value="active" className="space-y-6">
+            <ActivePrescriptions patient={patient} />
+          </TabsContent>
+
+          <TabsContent value="history" className="space-y-6">
+            <PastPrescriptions patient={patient} />
+          </TabsContent>
+
+          <TabsContent value="appointments" className="space-y-6">
+            <PatientAppointments patient={patient} />
+          </TabsContent>
+        </Tabs>
+      </main>
+    </div>
+  )
+}
+
+export default PatientDashboardLayout
+export { PatientDashboardLayout }
+
+
+components/patient-login-form.tsx
+// Content of components/patient-login-form.tsx:
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
+import { redirect, useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { User, Shield } from "lucide-react"
+import { login } from "@/lib/api/auth"
+
+// Dummy ABHA IDs for testing
+const dummyPatients = [
+  { abhaId: "12-3456-7890-1234", name: "Rajesh Kumar", age: 45, gender: "Male" },
+  { abhaId: "98-7654-3210-9876", name: "Priya Sharma", age: 32, gender: "Female" },
+  { abhaId: "11-2233-4455-6677", name: "Amit Patel", age: 28, gender: "Male" },
+  { abhaId: "55-6677-8899-0011", name: "Sunita Singh", age: 38, gender: "Female" },
+]
+
+export function PatientLoginForm() {
+  const [abhaId, setAbhaId] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+  const router = useRouter()
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setIsLoading(true)
+  setError("")
+  console.log("Submitting ABHA ID:", abhaId)
+
+  try {
+    const res= await login(abhaId, "patient");
+    
+    if (!res.success)
+    {
+      console.log(res.status)
+      throw new Error("Invalid ABHA ID" );
+    }
+    else
+    {
+      router.push("/patient/check-email")
+   }
+  } catch (err: any) {
+    setError(err.message || "Login failed. Please try again.")
+  } finally {
+    setIsLoading(false)
+  }
+}
+
+
+  return (
+    <Card className="w-full">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl text-center flex items-center justify-center gap-2">
+          <User className="h-6 w-6 text-primary" />
+          Patient Login
+        </CardTitle>
+        <CardDescription className="text-center">Enter your ABHA ID to access your health records</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="abhaId">ABHA ID</Label>
+            <Input
+              id="abhaId"
+              type="text"
+              placeholder="12-3456-7890-1234"
+              value={abhaId}
+              onChange={(e) => setAbhaId(e.target.value)}
+              required
+              className="text-center tracking-wider"
+            />
+          </div>
+
+          {error && <div className="text-destructive text-sm text-center">{error}</div>}
+
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Signing In..." : "Sign In"}
+          </Button>
+        </form>
+
+        <div className="mt-6 p-4 bg-muted rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <Shield className="h-4 w-4 text-accent" />
+            <span className="text-sm font-medium">Demo ABHA IDs:</span>
+          </div>
+          <div className="text-xs text-muted-foreground space-y-1">
+            <div>12-3456-7890-0001 (Mithrajeeth Yadavar)</div>
+            <div>98-7654-3210-9876 (Priya Sharma)</div>
+            <div>11-2233-4455-6677 (Amit Patel)</div>
+            <div>55-6677-8899-0011 (Sunita Singh)</div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+
+components/patient-profile.tsx
+// Content of components/patient-profile.tsx:
+"use client"
+
+import { EmergencyDetailsCard } from "./EmergencyDetailsCard"
+import { ProfileCard } from "./ProfileCard"
+import { ContactCard } from "./ContactCard"
+import { MedicalInfoCard } from "./MedicalInfoCard"
+
+interface Patient {
+  abhaId: string
+  name: string
+  age: number
+  gender: string
+}
+
+interface PatientProfileProps {
+  patient: Patient
+}
+
+export function PatientProfile({ patient }: PatientProfileProps) {
+  // Mock additional patient data
+  const mockPatient = {
+  fullName: "Rajesh Kumar",
+  age: 20,
+  gender: "Male",
+  bloodGroup: "A+",
+  abhaId: "12-1234-1234-1234",
+  emergencyContact: {
+    name: "Dr. Sarah Wilson",
+    relation: "Primary Contact",
+    phone: "+91 87654 32109",
+  },
+  medical: {
+    allergies: ["Penicillin", "Shellfish"],
+    chronicConditions: ["Hypertension", "Diabetes Type 2"],
+  },
+  contact: {
+    phone: "+91 94224 95181",
+    email: "workingaaru@gmail.com",
+    address: {
+      line1: "123 Health Street",
+      city: "Medical City",
+      state: "State",
+      postalCode: "110001",
+      country: "India",
+    },
+  }
+}
+
+
+  return (
+    <div className="grid gap-6 md:grid-cols-2">
+      <ProfileCard
+        fullName={mockPatient.fullName}
+        abhaId={mockPatient.abhaId}
+        age={mockPatient.age}
+        gender={mockPatient.gender}
+        bloodGroup={mockPatient.bloodGroup}
+      />
+
+      <ContactCard contact={mockPatient.contact} />
+
+      <MedicalInfoCard medical={mockPatient.medical} />
+
+      <EmergencyDetailsCard
+        fullName={mockPatient.fullName}
+        age={mockPatient.age}
+        gender={mockPatient.gender}
+        bloodGroup={mockPatient.bloodGroup}
+        emergencyContact={mockPatient.emergencyContact}
+        medical={mockPatient.medical}
+      />
+
+    </div>
+  )
+}
+
+
+dashboard/page.tsx
+// Content of dashboard/page.tsx:
+"use client"
+
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { PatientDashboardLayout } from "../components/patient-dashboard-layout"
+
+interface Patient {
+  abhaId: string
+  name: string
+  age: number
+  gender: string
+}
+
+export default function PatientDashboard() {
+  const [patient, setPatient] = useState<Patient | null>(null)
+  const router = useRouter()
+
+  useEffect(() => {
+    const patientData = localStorage.getItem("currentPatient")
+    if (patientData) {
+      setPatient(JSON.parse(patientData))
+    } else {
+      router.push("/")
+    }
+  }, [router])
+
+  if (!patient) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return <PatientDashboardLayout patient={patient} />
+}
+
+
+login/page.tsx
+// Content of login/page.tsx:
+import { PatientLoginForm } from "../components/patient-login-form"
+
+export default function PatientLoginPage() {
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Patient Portal</h1>
+          <p className="text-muted-foreground">Access Your Health Records with ABHA ID</p>
+        </div>
+        <PatientLoginForm />
+      </div>
+    </div>
+  )
+}
+
+
+register/page.tsx
+// Content of register/page.tsx:
+"use client"
+
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
+export default function PatientRegisterPage() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8 mt-20">
+        <h1 className="text-2xl font-bold mb-6 text-center">Patient Registration</h1>
+        
+        <form className="space-y-6">
+            <div>
+                <Label htmlFor="name" className="mb-4">Full Name</Label>
+                <Input id="name" type="text" placeholder="Jane Doe" required />
+            </div>
+            <div>
+                <Label htmlFor="abha" className="mb-4">ABHA Number</Label>
+                <Input id="abha" type="text" placeholder="14-digit ABHA number" required />
+            </div>
+            <div>
+                <Label htmlFor="mobile" className="mb-4">Mobile Number</Label>
+                <Input id="mobile" type="tel" placeholder="+91 9876543210" required />
+            </div>
+            <div>
+                <Label htmlFor="email" className="mb-4">Email</Label>
+                <Input id="email" type="email" placeholder="patient@example.com" required />
+            </div>
+            <div>
+                <Label htmlFor="gender" className="mb-4">Gender</Label>
+                <select
+                id="gender"
+                className="w-full rounded-md border p-2"
+                required
+                >
+                <option value="">Select Gender</option>
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+                <option value="O">Other</option>
+                </select>
+            </div>
+            <div>
+                <Label htmlFor="dob" className="mb-4">Date of Birth</Label>
+                <Input id="dob" type="date" required />
+            </div>
+
+            <Button type="submit" className="w-full">Register</Button>
+        </form>
+
+
+        <p className="text-center text-sm text-gray-600 mt-4">
+          Already have an account?{" "}
+          <Link href="/patient/login" className="text-blue-600 hover:underline">
+            Sign in here
+          </Link>
+        </p>
+      </div>
+    </div>
+  )
+}
+
+

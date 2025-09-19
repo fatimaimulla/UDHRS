@@ -1,0 +1,20 @@
+./app/patient
+├── check-email
+│   └── page.tsx
+├── components
+│   ├── ContactCard.tsx
+│   ├── EmergencyDetailsCard.tsx
+│   ├── MedicalInfoCard.tsx
+│   ├── ProfileCard.tsx
+│   ├── active-prescriptions.tsx
+│   ├── past-prescriptions.tsx
+│   ├── patient-appointments.tsx
+│   ├── patient-dashboard-layout.tsx
+│   ├── patient-login-form.tsx
+│   └── patient-profile.tsx
+├── dashboard
+│   └── page.tsx
+├── login
+│   └── page.tsx
+└── register
+    └── page.tsx
