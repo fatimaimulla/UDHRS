@@ -6,10 +6,35 @@ import { Button } from "@/components/ui/button"
 import { Pill, Clock, Calendar, Download, Eye } from "lucide-react"
 
 interface Patient {
+  _id: string
+  fullName: string
   abhaId: string
-  name: string
-  age: number
   gender: string
+  age: number
+  bloodGroup: string
+  medical: {
+    allergies: string[]
+    chronicConditions: string[]
+  }
+  contact: {
+    phone: string
+    email: string
+    address: {
+      line1: string
+      city: string
+      state: string
+      postalCode: string
+      country: string
+    }
+  }
+  emergencyContact: {
+    name: string
+    relation: string
+    phone: string
+  }
+  createdAt: string
+  updatedAt: string
+  __v: number
 }
 
 interface ActivePrescriptionsProps {

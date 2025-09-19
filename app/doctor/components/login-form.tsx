@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Stethoscope } from "lucide-react"
-
+import { login } from "@/lib/api/auth"
 export function LoginForm() {
   const [nmcId, setNmcId] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -18,24 +18,18 @@ export function LoginForm() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!nmcId.trim()) return
-
     setIsLoading(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const message = await login(nmcId, "doctor");
+     
 
-    // Store doctor info in localStorage (dummy data)
-    const doctorData = {
-      nmcId,
-      name: "Dr. Sarah Johnson",
-      specialization: "Internal Medicine",
-      hospital: "City General Hospital",
+      
+    } catch (err) {
+      
+    } finally {
+      setIsLoading(false)
     }
-
-    localStorage.setItem("doctorData", JSON.stringify(doctorData))
-
-    setIsLoading(false)
-    router.push("/doctor/dashboard")
   }
 
   return (

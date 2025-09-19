@@ -10,18 +10,45 @@ import { PastPrescriptions } from "./past-prescriptions"
 import { PatientAppointments } from "./patient-appointments"
 import { User, FileText, History, Calendar, LogOut, Menu, X } from "lucide-react"
 
-interface Patient {
+export interface Patient {
+  _id: string
+  fullName: string
   abhaId: string
-  name: string
-  age: number
   gender: string
+  age: number
+  bloodGroup: string
+  medical: {
+    allergies: string[]
+    chronicConditions: string[]
+  }
+  contact: {
+    phone: string
+    email: string
+    address: {
+      line1: string
+      city: string
+      state: string
+      postalCode: string
+      country: string
+    }
+  }
+  emergencyContact: {
+    name: string
+    relation: string
+    phone: string
+  }
+  createdAt: string
+  updatedAt: string
+  __v: number
 }
 
 interface PatientDashboardLayoutProps {
   patient: Patient
 }
 
-const PatientDashboardLayout = ({ patient }: PatientDashboardLayoutProps) => {
+const PatientDashboardLayout = ({ patient }: PatientDashboardLayoutProps) =>
+{
+  console.log("Patient in Layout:", patient);
   const [activeTab, setActiveTab] = useState("profile")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const router = useRouter()
@@ -58,7 +85,7 @@ const PatientDashboardLayout = ({ patient }: PatientDashboardLayoutProps) => {
 
             <div className="flex items-center gap-4">
               <div className="hidden sm:block text-right">
-                <p className="text-sm font-medium text-foreground">{patient.name}</p>
+                <p className="text-sm font-medium text-foreground">{patient.fullName}</p>
                 <p className="text-xs text-muted-foreground">ABHA: {patient.abhaId}</p>
               </div>
               <Button
@@ -87,7 +114,7 @@ const PatientDashboardLayout = ({ patient }: PatientDashboardLayoutProps) => {
           <div className="sm:hidden border-t border-border bg-card">
             <div className="px-4 py-3 space-y-2">
               <div className="text-center pb-2 border-b border-border">
-                <p className="text-sm font-medium text-foreground">{patient.name}</p>
+                <p className="text-sm font-medium text-foreground">{patient.fullName}</p>
                 <p className="text-xs text-muted-foreground">ABHA: {patient.abhaId}</p>
               </div>
               <Button
@@ -107,7 +134,7 @@ const PatientDashboardLayout = ({ patient }: PatientDashboardLayoutProps) => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-foreground mb-2">Welcome back, {patient.name.split(" ")[0]}!</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Welcome back, {patient.fullName.split(" ")[0]}!</h2>
           <p className="text-muted-foreground">Access and manage your health records</p>
         </div>
 

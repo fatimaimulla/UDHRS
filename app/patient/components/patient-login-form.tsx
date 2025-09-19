@@ -3,12 +3,13 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { User, Shield } from "lucide-react"
+import { login } from "@/lib/api/auth"
 
 // Dummy ABHA IDs for testing
 const dummyPatients = [
@@ -24,26 +25,31 @@ export function PatientLoginForm() {
   const [error, setError] = useState("")
   const router = useRouter()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setIsLoading(true)
+  setError("")
+  console.log("Submitting ABHA ID:", abhaId)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    const patient = dummyPatients.find((p) => p.abhaId === abhaId)
-
-    if (patient) {
-      // Store patient data in localStorage for demo
-      localStorage.setItem("currentPatient", JSON.stringify(patient))
-      router.push("/patient/dashboard")
-    } else {
-      setError("Invalid ABHA ID. Please check and try again.")
+  try {
+    const res= await login(abhaId, "patient");
+    
+    if (!res.success)
+    {
+      console.log(res.status)
+      throw new Error("Invalid ABHA ID" );
     }
-
+    else
+    {
+      router.push("/patient/check-email")
+   }
+  } catch (err: any) {
+    setError(err.message || "Login failed. Please try again.")
+  } finally {
     setIsLoading(false)
   }
+}
+
 
   return (
     <Card className="w-full">
@@ -82,7 +88,7 @@ export function PatientLoginForm() {
             <span className="text-sm font-medium">Demo ABHA IDs:</span>
           </div>
           <div className="text-xs text-muted-foreground space-y-1">
-            <div>12-3456-7890-1234 (Rajesh Kumar)</div>
+            <div>12-3456-7890-0001 (Mithrajeeth Yadavar)</div>
             <div>98-7654-3210-9876 (Priya Sharma)</div>
             <div>11-2233-4455-6677 (Amit Patel)</div>
             <div>55-6677-8899-0011 (Sunita Singh)</div>
