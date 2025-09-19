@@ -37,7 +37,7 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
   const [showReview, setShowReview] = useState(false)
   const [isVoiceMode, setIsVoiceMode] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-
+  console.log("Selected Patient in PrescriptionForm:", selectedPatient)
   const frequencyOptions = [
     { value: "OD", label: "OD (Once Daily)" },
     { value: "BD", label: "BD (Twice Daily)" },
@@ -286,7 +286,7 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            Selected Patient
+            <span>Patient Details</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -296,7 +296,7 @@ export function PrescriptionForm({ selectedPatient ,onGoToFindPatient }: Prescri
                 {selectedPatient.name}
               </p>
               <p className="text-sm text-muted-foreground">
-                ID: {selectedPatient.id} • {selectedPatient.age} years •{" "}
+                AbhaID: {selectedPatient.abhaId} • {selectedPatient.age} years •{" "}
                 {selectedPatient.gender}
               </p>
             </div>
