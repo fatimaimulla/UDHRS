@@ -198,21 +198,53 @@ export function PrescriptionForm({
   }
 
   if (showReview) {
-    return (
-      <div className="space-y-6">
-        <Button
-          variant="ghost"
-          onClick={() => setShowReview(false)}
-          className="mb-4"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Edit
-        </Button>
+  return (
+    <div className="space-y-6">
+      <Button variant="ghost" onClick={() => setShowReview(false)} className="mb-4">
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Back to Edit
+      </Button>
 
-        {/* Review Section remains same... */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Review Prescription</CardTitle>
+          <CardDescription>Please confirm before saving.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <h3 className="font-semibold">Patient</h3>
+            <p>{selectedPatient.name} ({selectedPatient.age}, {selectedPatient.gender})</p>
+          </div>
+
+          <div>
+            <h3 className="font-semibold">Medicines</h3>
+            <ul className="list-disc pl-6">
+              {medicines.map((med) => (
+                <li key={med.id}>
+                  {med.name} – {med.strength}, {med.frequency}, {med.days} days
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {notes && (
+            <div>
+              <h3 className="font-semibold">Notes</h3>
+              <p>{notes}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="flex gap-4">
+        <Button onClick={handleSavePrescription} disabled={isSaving} className="flex-1">
+          {isSaving ? "Saving..." : "Save Prescription"}
+        </Button>
       </div>
-    );
-  }
+    </div>
+  )
+}
+
 
   return (
     <div className="space-y-6">

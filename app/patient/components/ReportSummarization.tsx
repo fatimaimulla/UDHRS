@@ -1,22 +1,82 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { FileText, Calendar } from "lucide-react"
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL
+
+interface DocumentItem {
+  id: string
+  name: string
+  category: "Reports" | "Scans" | "Prescriptions" | "Others"
+  uploadedAt: Date
+  fileUrl: string
+}
+
 export function ReportSummarization() {
+  const [documents, setDocuments] = useState<DocumentItem[]>([])
   const [selectedReports, setSelectedReports] = useState<string[]>([])
   const [selectedPeriod, setSelectedPeriod] = useState("")
+const savedToken = localStorage.getItem("authToken")
+  // Fetch documents from backend
+  const handleSummary = async () => {
+  try {
+    console.log("Generating summary for reports:", selectedReports[0]);
 
-  // Mock uploaded reports (later fetch from backend / UploadDocuments state)
-  const uploadedReports = [
-    { id: "1", name: "Blood Test Report.pdf", uploadedOn: "2025-08-20" },
-    { id: "2", name: "X-Ray Scan.pdf", uploadedOn: "2025-08-25" },
-    { id: "3", name: "MRI Report.pdf", uploadedOn: "2025-09-01" },
-  ]
+    const res = await fetch(`${API_BASE}/api/report-summarize`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${savedToken}`, // 👈 add token here
+      },
+      body: JSON.stringify({ report: selectedReports[0] }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Request failed: ${res.status}`);
+    }
+
+    const data = await res.json();
+    console.log("Summary response:", data);
+
+    return data;
+  } catch (err) {
+    console.error("Error summarizing report:", err);
+  }
+};
+  const fetchDocuments = async () => {
+    try {
+      const savedToken = localStorage.getItem("authToken")
+      const res = await fetch(`${API_BASE}/auth/getReport`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${savedToken}`,
+        },
+      })
+      if (!res.ok) throw new Error("Failed to fetch documents")
+
+      const data = await res.json()
+      const mappedDocs: DocumentItem[] = data.map((doc: any) => ({
+        id: doc._id,
+        name: doc.fileName,
+        category: doc.category,
+        uploadedAt: new Date(doc.uploadedAt),
+        fileUrl: doc.url,
+      }))
+
+      setDocuments(mappedDocs)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  useEffect(() => {
+    fetchDocuments()
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -40,8 +100,8 @@ export function ReportSummarization() {
               <SelectValue placeholder="Select a report" />
             </SelectTrigger>
             <SelectContent>
-              {uploadedReports.map((report) => (
-                <SelectItem key={report.id} value={report.id}>
+              {documents.map((report) => (
+                <SelectItem key={report.id} value={report.fileUrl}>
                   {report.name}
                 </SelectItem>
               ))}
@@ -49,7 +109,7 @@ export function ReportSummarization() {
           </Select>
 
           {selectedReports.map((reportId) => {
-            const report = uploadedReports.find((r) => r.id === reportId)
+            const report = documents.find((r) => r.id === reportId)
             return (
               <Card key={reportId} className="shadow-sm">
                 <CardHeader>
@@ -60,20 +120,21 @@ export function ReportSummarization() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Uploaded on {report?.uploadedOn}
+                    Uploaded on {report?.uploadedAt.toLocaleDateString()}
                   </p>
                   <p className="mt-2">
-                    <strong>Summary:</strong> This is a mock summary of {report?.name}. The system
-                    will provide key findings and insights here.
+                    <strong>Summary:</strong> This will be an AI-generated summary of{" "}
+                    {report?.name}. (currently placeholder)
                   </p>
                   <div className="flex gap-2 mt-4">
-                    <Button variant="outline" size="sm">View Report</Button>
-                    <Button variant="secondary" size="sm">Download Summary</Button>
+                    
+                    <Button className="bg-black" size="sm" onClick={handelSummary}>Generate Summary</Button>
                   </div>
                 </CardContent>
               </Card>
             )
           })}
+           
         </TabsContent>
 
         {/* Periodic Summary Tab */}

@@ -257,6 +257,7 @@ const PatientDashboardLayout = ({ patient }: PatientDashboardLayoutProps) => {
         {/* Main Content */}
         <main className="flex-1 p-4 lg:p-6 max-w-full overflow-hidden">
           {activeTab === "profile" && <PatientProfile patient={patient} />}
+          
           {activeTab === "active" && <ActivePrescriptions patient={patient} />}
           {activeTab === "history" && <PastPrescriptions patient={patient} />}
           {activeTab === "consent" && <ConsentDashboard />}
