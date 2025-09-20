@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Upload, Trash2, Eye, Search, Download } from "lucide-react"
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
 interface DocumentItem {
   id: string
@@ -25,6 +27,37 @@ export function UploadDocuments() {
   const [activeTab, setActiveTab] = useState<DocumentItem["category"]>("Reports")
   const [searchTerm, setSearchTerm] = useState("")
 
+  // Fetch documents from backend
+  const fetchDocuments = async () => {
+    try {
+      const savedToken = localStorage.getItem("authToken")
+      const res = await fetch(`${API_BASE}/auth/getReport`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${savedToken}`,
+        },
+      })
+      if (!res.ok) throw new Error("Failed to fetch documents")
+
+      const data = await res.json()
+      const mappedDocs: DocumentItem[] = data.map((doc: any) => ({
+        id: doc._id,
+        name: doc.fileName,
+        category: doc.category,
+        uploadedAt: new Date(doc.uploadedAt),
+        fileUrl: doc.url,
+      }))
+
+      setDocuments(mappedDocs)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  useEffect(() => {
+    fetchDocuments()
+  }, [])
+
   // File select
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -33,42 +66,66 @@ export function UploadDocuments() {
   }
 
   // Add document
- const handleAddDocument = async () => {
-  if (!file) return
+  const handleAddDocument = async () => {
+    if (!file) return
+    try {
+      // Step 1: Upload file to Cloudinary
+      const formData = new FormData()
+      formData.append("file", file)
 
-  const formData = new FormData()
-  formData.append("file", file)
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      })
 
-  const res = await fetch("/api/upload", {
-    method: "POST",
-    body: formData,
-  })
+      if (!res.ok) {
+        alert("Cloudinary upload failed")
+        return
+      }
 
-  if (!res.ok) {
-    alert("Upload failed")
-    return
+      const uploadData = await res.json()
+      const cloudUrl = uploadData.url // Cloudinary permanent URL
+
+      // Step 2: Save metadata to backend
+      const savedToken = localStorage.getItem("authToken")
+      const body = {
+        abhaId: "12-3456-7890-0001", // replace dynamically if needed
+        fileName: file.name,
+        category: category,
+        url: cloudUrl,
+      }
+
+      const postRes = await fetch(`${API_BASE}/auth/postReport`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${savedToken}`,
+        },
+        body: JSON.stringify(body),
+      })
+
+      if (!postRes.ok) throw new Error("Failed to save metadata")
+
+      const savedDoc = await postRes.json()
+
+      // Step 3: Update local state with returned document
+      const newDoc: DocumentItem = {
+        id: savedDoc._id,
+        name: savedDoc.fileName,
+        category: savedDoc.category,
+        uploadedAt: new Date(savedDoc.uploadedAt),
+        fileUrl: savedDoc.url,
+      }
+
+      setDocuments((prev) => [...prev, newDoc])
+      setFile(null)
+      setOpen(false)
+    } catch (err) {
+      console.error(err)
+    }
   }
 
-  const data = await res.json()
-  const cloudUrl = data.url // Cloudinary permanent URL
-
-  const newDoc: DocumentItem = {
-    id: Date.now().toString(),
-    name: file.name,
-    category: activeTab,
-    uploadedAt: new Date(),
-    fileUrl: cloudUrl,
-  }
-
-  setDocuments((prev) => [...prev, newDoc])
-  setFile(null)
-  setOpen(false)
-
-  // TODO: send this newDoc to your backend to save in DB
-}
-
-
-  // Delete doc
+  // Delete doc (only client-side removal here)
   const handleDelete = (id: string) => {
     setDocuments((prev) => prev.filter((doc) => doc.id !== id))
   }
@@ -81,7 +138,6 @@ export function UploadDocuments() {
     link.click()
   }
 
-  // Tabs
   const categories: DocumentItem["category"][] = ["Reports", "Scans", "Prescriptions", "Others"]
 
   return (
