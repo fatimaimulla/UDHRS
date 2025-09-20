@@ -12,15 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Search,
-  User,
-  Phone,
-  Calendar,
-  MapPin,
-  FileText,
-  History,
-} from "lucide-react";
+import { Search, User, Phone, Calendar, FileText, History } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
@@ -56,12 +48,13 @@ export function PatientSearch({
   const [isSearching, setIsSearching] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [error, setError] = useState("");
+  const [consentMessage, setConsentMessage] = useState<string | null>(null);
 
   const handleSearch = async () => {
     if (!searchTerm.trim()) return;
     setIsSearching(true);
     setError("");
-    setSelectedPatient(null); // reset previously selected
+    setSelectedPatient(null);
 
     try {
       const token = localStorage.getItem("authToken");
@@ -107,6 +100,46 @@ export function PatientSearch({
   const handleViewHistory = () => {
     if (selectedPatient) {
       onNavigateToHistory?.();
+    }
+  };
+
+  // ✅ Ask Consent API Call
+  const handleAskConsent = async () => {
+    if (!selectedPatient) {
+      setConsentMessage("Please select a patient first.");
+      return;
+    }
+
+    try {
+      setConsentMessage(null);
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        setConsentMessage("No token found, please login again.");
+        return;
+      }
+
+
+      const res = await fetch(`${API_BASE}/consent/request`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          abhaId: selectedPatient.abhaId,
+          
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to request consent");
+      }
+
+      setConsentMessage("✅ Consent request sent successfully!");
+    } catch (err: any) {
+      setConsentMessage(`❌ Error: ${err.message}`);
     }
   };
 
@@ -163,7 +196,6 @@ export function PatientSearch({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* No results */}
             {searchResults.length === 0 ? (
               <div className="p-6 text-center">
                 <Search className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
@@ -176,7 +208,6 @@ export function PatientSearch({
               </div>
             ) : (
               <div className="space-y-4">
-                {/* List results */}
                 {searchResults.map((patient) => (
                   <Card
                     key={patient._id}
@@ -206,7 +237,6 @@ export function PatientSearch({
                   </Card>
                 ))}
 
-                {/* Selected Patient Details */}
                 {selectedPatient && (
                   <div className="mt-6 border-t border-border pt-6">
                     <h4 className="text-accent font-semibold flex items-center gap-2 mb-4">
@@ -260,10 +290,14 @@ export function PatientSearch({
                         </div>
                       </div>
                     </div>
+
                     <div className="mt-6 flex flex-col sm:flex-row gap-4">
+                      {/* ✅ Ask Consent Button */}
+                      <Button onClick={handleAskConsent}>Ask Consent</Button>
+
                       <Button
                         className="flex-1 flex items-center gap-2"
-                        onClick={onNavigateToPrescription}
+                        onClick={handleCreatePrescription}
                       >
                         <FileText className="h-4 w-4" />
                         Create Prescription
@@ -271,12 +305,19 @@ export function PatientSearch({
                       <Button
                         variant="outline"
                         className="flex-1 flex items-center gap-2 bg-transparent"
-                        onClick={onNavigateToHistory}
+                        onClick={handleViewHistory}
                       >
                         <History className="h-4 w-4" />
                         View History
                       </Button>
                     </div>
+
+                    {/* ✅ Show Consent Response */}
+                    {consentMessage && (
+                      <p className="mt-3 text-sm text-muted-foreground">
+                        {consentMessage}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
