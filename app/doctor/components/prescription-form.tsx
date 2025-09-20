@@ -1,45 +1,61 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Plus, Trash2, FileText, Check, Mic, User, ArrowLeft } from "lucide-react"
-import { VoiceInput } from "./voice-input"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Plus, Trash2, FileText, Mic, User, ArrowLeft } from "lucide-react";
+import { VoiceInput } from "./voice-input";
 
 interface Medicine {
-  id: string
-  name: string
-  strength: string
-  frequency: string
-  days: number
+  id: string;
+  name: string;
+  strength: string;
+  frequency: string;
+  days: number;
+  summary?: string; // ✅ AI summary added
 }
 
 interface Patient {
-  id: string
-  name: string
-  age: number
-  gender: string
+  id: string;
+  name: string;
+  age: number;
+  gender: string;
 }
 
 interface PrescriptionFormProps {
-  selectedPatient: any
-  onGoToFindPatient: () => void
+  selectedPatient: any;
+  onGoToFindPatient: () => void;
 }
 
-export function PrescriptionForm({ selectedPatient, onGoToFindPatient }: PrescriptionFormProps) {
+export function PrescriptionForm({
+  selectedPatient,
+  onGoToFindPatient,
+}: PrescriptionFormProps) {
   const [medicines, setMedicines] = useState<Medicine[]>([
-    { id: "1", name: "", strength: "", frequency: "", days: 0 },
-  ])
-  const [notes, setNotes] = useState("")
-  const [showReview, setShowReview] = useState(false)
-  const [isVoiceMode, setIsVoiceMode] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
+    { id: "1", name: "", strength: "", frequency: "", days: 0, summary: "" },
+  ]);
+  const [notes, setNotes] = useState("");
+  const [showReview, setShowReview] = useState(false);
+  const [isVoiceMode, setIsVoiceMode] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const frequencyOptions = [
     { value: "OD", label: "OD (Once Daily)" },
@@ -48,22 +64,38 @@ export function PrescriptionForm({ selectedPatient, onGoToFindPatient }: Prescri
     { value: "Morning", label: "Morning Only" },
     { value: "Evening", label: "Evening Only" },
     { value: "Morning-Evening", label: "Morning & Evening" },
-  ]
+  ];
 
   const addMedicineRow = () => {
-    const newId = (medicines.length + 1).toString()
-    setMedicines([...medicines, { id: newId, name: "", strength: "", frequency: "", days: 0 }])
-  }
+    const newId = (medicines.length + 1).toString();
+    setMedicines([
+      ...medicines,
+      {
+        id: newId,
+        name: "",
+        strength: "",
+        frequency: "",
+        days: 0,
+        summary: "",
+      },
+    ]);
+  };
 
   const removeMedicineRow = (id: string) => {
     if (medicines.length > 1) {
-      setMedicines(medicines.filter((med) => med.id !== id))
+      setMedicines(medicines.filter((med) => med.id !== id));
     }
-  }
+  };
 
-  const updateMedicine = (id: string, field: keyof Medicine, value: string | number) => {
-    setMedicines(medicines.map((med) => (med.id === id ? { ...med, [field]: value } : med)))
-  }
+  const updateMedicine = (
+    id: string,
+    field: keyof Medicine,
+    value: string | number
+  ) => {
+    setMedicines(
+      medicines.map((med) => (med.id === id ? { ...med, [field]: value } : med))
+    );
+  };
 
   const frequencyMap: { [key: string]: string } = {
     OD: "OD",
@@ -72,60 +104,74 @@ export function PrescriptionForm({ selectedPatient, onGoToFindPatient }: Prescri
     "Morning Only": "Morning",
     "Evening Only": "Evening",
     "Morning & Evening": "Morning-Evening",
-  }
+  };
 
+  // ✅ Now includes summary from AI response
   const handleVoiceMedicines = (voiceMedicines: Medicine[]) => {
     setMedicines((prevMedicines) => {
-      const isOnlyEmpty = prevMedicines.length === 1 && prevMedicines[0].name.trim() === ""
-      const existingNames = new Set(prevMedicines.map((med) => med.name.trim().toLowerCase()))
+      const isOnlyEmpty =
+        prevMedicines.length === 1 && prevMedicines[0].name.trim() === "";
+      const existingNames = new Set(
+        prevMedicines.map((med) => med.name.trim().toLowerCase())
+      );
 
       const newMedicines = voiceMedicines.filter(
         (med) => !existingNames.has(med.name.trim().toLowerCase())
-      )
+      );
 
       const updatedNewMedicines = newMedicines.map((med) => ({
         ...med,
         id: `${Date.now()}-${Math.random()}`,
         frequency: frequencyMap[med.frequency] || med.frequency,
         days: med.days && med.days > 0 ? med.days : 0,
-      }))
+        summary: med.summary || "", // ✅ keep AI summary
+      }));
 
       if (isOnlyEmpty) {
-        return updatedNewMedicines.length > 0 ? updatedNewMedicines : prevMedicines
+        return updatedNewMedicines.length > 0
+          ? updatedNewMedicines
+          : prevMedicines;
       }
 
-      return [...prevMedicines, ...updatedNewMedicines]
-    })
+      return [...prevMedicines, ...updatedNewMedicines];
+    });
 
-    setIsVoiceMode(false)
-  }
+    setIsVoiceMode(false);
+  };
 
   const handleVoiceNotes = (voiceNotes: string) => {
-    setNotes(voiceNotes)
-  }
+    setNotes(voiceNotes);
+  };
 
   const handleReview = () => {
-    setShowReview(true)
-  }
+    setShowReview(true);
+  };
 
   const handleSavePrescription = async () => {
-    setIsSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    setIsSaving(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    setMedicines([{ id: "1", name: "", strength: "", frequency: "", days: 0 }])
-    setNotes("")
-    setShowReview(false)
-    setIsSaving(false)
+    setMedicines([
+      { id: "1", name: "", strength: "", frequency: "", days: 0, summary: "" },
+    ]);
+    setNotes("");
+    setShowReview(false);
+    setIsSaving(false);
 
-    alert("Prescription saved successfully!")
-  }
+    alert("Prescription saved successfully!");
+  };
 
   const isFormValid = () => {
     return (
-      medicines.every((med) => med.name.trim() && med.strength.trim() && med.frequency && med.days > 0) &&
-      selectedPatient
-    )
-  }
+      medicines.every(
+        (med) =>
+          med.name.trim() &&
+          med.strength.trim() &&
+          med.frequency &&
+          med.days > 0
+      ) && selectedPatient
+    );
+  };
 
   if (!selectedPatient) {
     return (
@@ -134,9 +180,12 @@ export function PrescriptionForm({ selectedPatient, onGoToFindPatient }: Prescri
           <div className="flex flex-col items-center space-y-4">
             <User className="h-12 w-12 text-muted-foreground" />
             <div>
-              <h3 className="text-lg font-semibold text-foreground">No Patient Selected</h3>
+              <h3 className="text-lg font-semibold text-foreground">
+                No Patient Selected
+              </h3>
               <p className="text-muted-foreground text-balance">
-                Please select a patient from the "Find Patient" section to create a prescription.
+                Please select a patient from the "Find Patient" section to
+                create a prescription.
               </p>
             </div>
             <Button variant="outline" onClick={() => onGoToFindPatient()}>
@@ -145,20 +194,24 @@ export function PrescriptionForm({ selectedPatient, onGoToFindPatient }: Prescri
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (showReview) {
     return (
       <div className="space-y-6">
-        <Button variant="ghost" onClick={() => setShowReview(false)} className="mb-4">
+        <Button
+          variant="ghost"
+          onClick={() => setShowReview(false)}
+          className="mb-4"
+        >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Edit
         </Button>
 
         {/* Review Section remains same... */}
       </div>
-    )
+    );
   }
 
   return (
@@ -174,9 +227,12 @@ export function PrescriptionForm({ selectedPatient, onGoToFindPatient }: Prescri
         <CardContent>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <p className="font-semibold text-balance">{selectedPatient.name}</p>
+              <p className="font-semibold text-balance">
+                {selectedPatient.name}
+              </p>
               <p className="text-sm text-muted-foreground">
-                AbhaID: {selectedPatient.abhaId} • {selectedPatient.age} years • {selectedPatient.gender}
+                AbhaID: {selectedPatient.abhaId} • {selectedPatient.age} years •{" "}
+                {selectedPatient.gender}
               </p>
             </div>
             <Badge variant="secondary">Active</Badge>
@@ -211,7 +267,10 @@ export function PrescriptionForm({ selectedPatient, onGoToFindPatient }: Prescri
 
         <CardContent className="space-y-6">
           {isVoiceMode ? (
-            <VoiceInput onMedicinesGenerated={handleVoiceMedicines} onNotesGenerated={handleVoiceNotes} />
+            <VoiceInput
+              onMedicinesGenerated={handleVoiceMedicines}
+              onNotesGenerated={handleVoiceNotes}
+            />
           ) : (
             <>
               {/* Medicine Rows */}
@@ -247,37 +306,56 @@ export function PrescriptionForm({ selectedPatient, onGoToFindPatient }: Prescri
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                       <div>
-                        <Label htmlFor={`medicine-name-${medicine.id}`}>Medicine Name</Label>
+                        <Label htmlFor={`medicine-name-${medicine.id}`}>
+                          Medicine Name
+                        </Label>
                         <Input
                           id={`medicine-name-${medicine.id}`}
                           placeholder="e.g., Paracetamol"
                           value={medicine.name}
-                          onChange={(e) => updateMedicine(medicine.id, "name", e.target.value)}
+                          onChange={(e) =>
+                            updateMedicine(medicine.id, "name", e.target.value)
+                          }
                         />
                       </div>
 
                       <div>
-                        <Label htmlFor={`medicine-strength-${medicine.id}`}>Strength</Label>
+                        <Label htmlFor={`medicine-strength-${medicine.id}`}>
+                          Strength
+                        </Label>
                         <Input
                           id={`medicine-strength-${medicine.id}`}
                           placeholder="e.g., 500mg"
                           value={medicine.strength}
-                          onChange={(e) => updateMedicine(medicine.id, "strength", e.target.value)}
+                          onChange={(e) =>
+                            updateMedicine(
+                              medicine.id,
+                              "strength",
+                              e.target.value
+                            )
+                          }
                         />
                       </div>
 
                       <div>
-                        <Label htmlFor={`medicine-frequency-${medicine.id}`}>Frequency</Label>
+                        <Label htmlFor={`medicine-frequency-${medicine.id}`}>
+                          Frequency
+                        </Label>
                         <Select
                           value={medicine.frequency}
-                          onValueChange={(value) => updateMedicine(medicine.id, "frequency", value)}
+                          onValueChange={(value) =>
+                            updateMedicine(medicine.id, "frequency", value)
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select frequency" />
                           </SelectTrigger>
                           <SelectContent>
                             {frequencyOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                              >
                                 {option.label}
                               </SelectItem>
                             ))}
@@ -286,7 +364,9 @@ export function PrescriptionForm({ selectedPatient, onGoToFindPatient }: Prescri
                       </div>
 
                       <div>
-                        <Label htmlFor={`medicine-days-${medicine.id}`}>Days</Label>
+                        <Label htmlFor={`medicine-days-${medicine.id}`}>
+                          Days
+                        </Label>
                         <Input
                           id={`medicine-days-${medicine.id}`}
                           type="number"
@@ -294,7 +374,11 @@ export function PrescriptionForm({ selectedPatient, onGoToFindPatient }: Prescri
                           placeholder="e.g., 7"
                           value={medicine.days || ""}
                           onChange={(e) =>
-                            updateMedicine(medicine.id, "days", Number.parseInt(e.target.value) || 0)
+                            updateMedicine(
+                              medicine.id,
+                              "days",
+                              Number.parseInt(e.target.value) || 0
+                            )
                           }
                         />
                       </div>
@@ -303,26 +387,32 @@ export function PrescriptionForm({ selectedPatient, onGoToFindPatient }: Prescri
                 ))}
               </div>
 
-              {/* ✅ Medicine Summary */}
+              {/* ✅ Medicine Summary with AI knowledge */}
               {medicines.some((med) => med.name.trim()) && (
                 <Card className="border border-primary mt-6">
                   <CardHeader>
                     <CardTitle>Medicine Summary</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ul className="space-y-2 text-sm">
+                    <ul className="space-y-3 text-sm">
                       {medicines
                         .filter((med) => med.name.trim())
                         .map((med, idx) => (
-                          <li
-                            key={med.id}
-                            className="flex items-center justify-between border-b pb-1"
-                          >
-                            <span>
-                              <strong>{med.name}</strong> – {med.strength},{" "}
-                              {med.frequency}, {med.days} days
-                            </span>
-                            <Badge variant="outline">{idx + 1}</Badge>
+                          <li key={med.id} className="border-b pb-3">
+                            <div className="flex justify-between items-center">
+                              <span>
+                                <strong>{med.name}</strong> – {med.strength},{" "}
+                                {med.frequency}, {med.days} days
+                              </span>
+                              <Badge variant="outline">{idx + 1}</Badge>
+                            </div>
+
+                            {/* ✅ Show AI-generated summary */}
+                            {med.summary && med.summary.trim() !== "" && (
+                              <div className="mt-2 bg-muted p-2 rounded text-gray-600 text-sm leading-relaxed font-bold">
+                                {med.summary}
+                              </div>
+                            )}
                           </li>
                         ))}
                     </ul>
@@ -346,7 +436,11 @@ export function PrescriptionForm({ selectedPatient, onGoToFindPatient }: Prescri
 
               {/* Action Buttons */}
               <div className="flex gap-4">
-                <Button onClick={handleReview} disabled={!isFormValid()} className="flex-1">
+                <Button
+                  onClick={handleReview}
+                  disabled={!isFormValid()}
+                  className="flex-1"
+                >
                   Review Prescription
                 </Button>
               </div>
@@ -355,5 +449,5 @@ export function PrescriptionForm({ selectedPatient, onGoToFindPatient }: Prescri
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

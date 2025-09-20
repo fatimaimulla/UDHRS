@@ -19,15 +19,25 @@ export async function POST(req: Request) {
           messages: [
             {
               role: "user",
-              content: `Extract the medicines, strengths, frequency per day, and duration from this text: "${transcript}". Return JSON only in this exact format without explanation:
+              content: `Extract the medicines, strengths, frequency per day, and duration from this text: "${transcript}". 
+Return JSON only in this exact format without explanation:
 {
   "medicine": [],
   "medicineStrength": [],
   "frequencyForDay": [],
   "forHowManyDays": [],
   "note": [],
+  "summary": []
 }
-Use these frequency terms where appropriate: "OD", "BD", "TDS", "Morning Only", "Evening Only", "Morning & Evening". If there is no note, keep "note" as a empty array.`,
+
+- Use these frequency terms where appropriate: "OD", "BD", "TDS", "Morning Only", "Evening Only", "Morning & Evening".
+- If there is no note, keep "note" as an empty array.
+- In the "summary" field, return an array of short knowledge snippets (one per medicine) describing:
+  • What the medicine is generally used for  
+  • Common side-effects or precautions  
+  • Important instructions (e.g. take after meals, avoid alcohol, may cause drowsiness, etc.)
+
+Keep each summary as a simple, human-readable sentence (not too long).`,
             },
           ],
           temperature: 0,
