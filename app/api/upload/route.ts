@@ -21,9 +21,12 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(arrayBuffer)
 
     // Upload to Cloudinary
-    const uploaded = await new Promise((resolve, reject) => {
+    const uploaded = await new Promise<any>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: "my-documents" }, // optional: categorize in a folder
+        {
+          folder: "my-documents",
+          resource_type: "auto", // 👈 ensures PDFs, videos, images all work
+        },
         (error, result) => {
           if (error) reject(error)
           else resolve(result)
@@ -32,7 +35,13 @@ export async function POST(req: NextRequest) {
       uploadStream.end(buffer)
     })
 
-    return NextResponse.json(uploaded)
+    // Always return only the usable link + meta
+    return NextResponse.json({
+      url: uploaded.secure_url,
+      public_id: uploaded.public_id,
+      resource_type: uploaded.resource_type,
+      format: uploaded.format,
+    })
   } catch (err: any) {
     console.error("Cloudinary upload error:", err)
     return NextResponse.json({ error: "Upload failed" }, { status: 500 })

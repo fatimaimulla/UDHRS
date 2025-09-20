@@ -50,7 +50,7 @@ export function UploadDocuments() {
   }
 
   const data = await res.json()
-  const cloudUrl = data.secure_url // Cloudinary permanent URL
+  const cloudUrl = data.url // Cloudinary permanent URL
 
   const newDoc: DocumentItem = {
     id: Date.now().toString(),
