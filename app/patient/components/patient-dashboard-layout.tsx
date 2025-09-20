@@ -244,13 +244,13 @@ const PatientDashboardLayout = ({ patient }: PatientDashboardLayoutProps) => {
             >
               <Folder className="mr-2 h-4 w-4" /> ReportSummarization
             </Button>
-            <Button
+            {/* <Button
                 variant={activeTab === "groups" ? "default" : "ghost"}
                 className="w-full justify-start"
                 onClick={() => setActiveTab("groups")}
               >
               <Users className="mr-2 h-4 w-4" /> Groups
-            </Button>
+            </Button> */}
           </nav>
         </aside>
 

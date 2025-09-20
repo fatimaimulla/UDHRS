@@ -21,32 +21,17 @@ export function ReportSummarization() {
   const [documents, setDocuments] = useState<DocumentItem[]>([])
   const [selectedReports, setSelectedReports] = useState<string[]>([])
   const [selectedPeriod, setSelectedPeriod] = useState("")
+  const [summary, setSummary] = useState("")
+  //
 const savedToken = localStorage.getItem("authToken")
   // Fetch documents from backend
   const handleSummary = async () => {
-  try {
-    console.log("Generating summary for reports:", selectedReports[0]);
+    console.log("Generating summary for reports:", documents)
+    console.log("Using token:",selectedReports[0] )
+    const foundDoc = documents.find(doc => doc.id === selectedReports[0]);
 
-    const res = await fetch(`${API_BASE}/api/report-summarize`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${savedToken}`, // 👈 add token here
-      },
-      body: JSON.stringify({ report: selectedReports[0] }),
-    });
-
-    if (!res.ok) {
-      throw new Error(`Request failed: ${res.status}`);
-    }
-
-    const data = await res.json();
-    console.log("Summary response:", data);
-
-    return data;
-  } catch (err) {
-    console.error("Error summarizing report:", err);
-  }
+    console.log("Found document:", foundDoc);
+    setSummary("");
 };
   const fetchDocuments = async () => {
     try {
@@ -101,7 +86,7 @@ const savedToken = localStorage.getItem("authToken")
             </SelectTrigger>
             <SelectContent>
               {documents.map((report) => (
-                <SelectItem key={report.id} value={report.fileUrl}>
+                <SelectItem key={report.id} value={report.id}>
                   {report.name}
                 </SelectItem>
               ))}
@@ -123,12 +108,11 @@ const savedToken = localStorage.getItem("authToken")
                     Uploaded on {report?.uploadedAt.toLocaleDateString()}
                   </p>
                   <p className="mt-2">
-                    <strong>Summary:</strong> This will be an AI-generated summary of{" "}
-                    {report?.name}. (currently placeholder)
+                    <strong>Summary:</strong> {summary || "No summary generated yet."}
                   </p>
                   <div className="flex gap-2 mt-4">
                     
-                    <Button className="bg-black" size="sm" onClick={handelSummary}>Generate Summary</Button>
+                    <Button className="bg-black" size="sm" onClick={handleSummary}>Generate Summary</Button>
                   </div>
                 </CardContent>
               </Card>

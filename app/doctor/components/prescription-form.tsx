@@ -158,7 +158,8 @@ export function PrescriptionForm({
     setShowReview(false);
     setIsSaving(false);
 
-    alert("Prescription saved successfully!");
+    // alert("Prescription saved successfully!");
+    return(<div className="font-sm text-bold text-green-700">Prescription saved successfully!</div>)
   };
 
   const isFormValid = () => {

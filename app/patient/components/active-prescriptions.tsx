@@ -54,7 +54,7 @@ export function ActivePrescriptions() {
           data.filter((p: Prescription) => p.status === "Active")
         );
       } catch (err: any) {
-        setError(err.message || "Failed to load prescriptions");
+        setError( "No Active Prescriptions Found");
       } finally {
         setLoading(false);
       }
