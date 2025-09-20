@@ -33,19 +33,40 @@ export function UploadDocuments() {
   }
 
   // Add document
-  const handleAddDocument = () => {
-    if (!file) return
-    const newDoc: DocumentItem = {
-      id: Date.now().toString(),
-      name: file.name,
-      category: activeTab,
-      uploadedAt: new Date(),
-      fileUrl: URL.createObjectURL(file),
-    }
-    setDocuments((prev) => [...prev, newDoc])
-    setFile(null)
-    setOpen(false)
+ const handleAddDocument = async () => {
+  if (!file) return
+
+  const formData = new FormData()
+  formData.append("file", file)
+
+  const res = await fetch("/api/upload", {
+    method: "POST",
+    body: formData,
+  })
+
+  if (!res.ok) {
+    alert("Upload failed")
+    return
   }
+
+  const data = await res.json()
+  const cloudUrl = data.secure_url // Cloudinary permanent URL
+
+  const newDoc: DocumentItem = {
+    id: Date.now().toString(),
+    name: file.name,
+    category: activeTab,
+    uploadedAt: new Date(),
+    fileUrl: cloudUrl,
+  }
+
+  setDocuments((prev) => [...prev, newDoc])
+  setFile(null)
+  setOpen(false)
+
+  // TODO: send this newDoc to your backend to save in DB
+}
+
 
   // Delete doc
   const handleDelete = (id: string) => {
